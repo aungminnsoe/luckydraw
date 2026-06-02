@@ -4,13 +4,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0a0a12">
+<!-- CACHE BUSTING: forces phone to download fresh version -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <link rel="manifest" href="manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Lucky Draw">
 <link rel="apple-touch-icon" href="icon.svg">
 <link rel="icon" type="image/svg+xml" href="icon.svg">
-<title>Lucky Draw 🎱</title>
+<title>Lucky Draw 🎱 v3</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+Myanmar:wght@400;600&display=swap" rel="stylesheet">
@@ -34,14 +38,13 @@
   }
   body::before {
     content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
-    background:
-      radial-gradient(circle at 20% 0%, rgba(255,180,0,0.08), transparent 50%),
-      radial-gradient(circle at 80% 100%, rgba(120,80,255,0.08), transparent 50%);
+    background: radial-gradient(circle at 20% 0%, rgba(255,180,0,0.08), transparent 50%), radial-gradient(circle at 80% 100%, rgba(120,80,255,0.08), transparent 50%);
   }
   .app { position: relative; z-index: 1; max-width: 480px; margin: 0 auto; padding: 20px 18px 0; }
   .top-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
   .logo { font-family: 'Black Han Sans', sans-serif; font-size: 1.3rem; color: var(--gold); letter-spacing: 1px; }
   .logo .dot { color: var(--text); }
+  .logo .ver { font-family: 'DM Sans', sans-serif; font-size: 0.6rem; color: var(--muted); margin-left: 6px; font-weight: 600; letter-spacing: 0; }
   .profile-chip { background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 8px 14px 8px 8px; display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.85rem; font-weight: 600; }
   .avatar { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.85rem; color: #0a0a12; }
   .view { display: none; animation: fadeIn 0.3s ease; }
@@ -68,17 +71,33 @@
   .zodiac-tile .sub { font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
   .lucky-numbers { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 8px; }
   .lucky-num { width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, var(--gold2), var(--gold)); color: #0a0a12; display: flex; align-items: center; justify-content: center; font-family: 'Black Han Sans', sans-serif; font-size: 1.1rem; box-shadow: 0 4px 12px rgba(255,180,0,0.3); }
+
+  /* Game toggle */
+  .game-toggle { display: flex; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 4px; margin-bottom: 18px; }
+  .game-toggle button { flex: 1; background: none; border: none; padding: 12px 8px; font-family: 'Black Han Sans', sans-serif; font-size: 0.95rem; color: var(--muted); cursor: pointer; border-radius: 10px; letter-spacing: 1px; transition: all 0.2s; }
+  .game-toggle button.active { background: linear-gradient(135deg, var(--gold2), var(--gold)); color: #0a0a12; box-shadow: 0 3px 10px rgba(255,180,0,0.25); }
+
   .strategy-pills { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin: 0 -18px 16px; padding-left: 18px; padding-right: 18px; scrollbar-width: none; }
   .strategy-pills::-webkit-scrollbar { display: none; }
   .pill { flex-shrink: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 10px 16px; font-size: 0.82rem; font-weight: 600; cursor: pointer; color: var(--muted); transition: all 0.2s; white-space: nowrap; font-family: inherit; }
   .pill.active { background: linear-gradient(135deg, var(--gold2), var(--gold)); color: #0a0a12; border-color: transparent; box-shadow: 0 3px 12px rgba(255,180,0,0.3); }
+
   .balls-display { min-height: 220px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; }
   .balls-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; width: 100%; }
-  .ball-wrap { display: flex; flex-direction: column; align-items: center; gap: 6px; opacity: 0; transform: translateY(20px) scale(0.7); transition: opacity 0.4s, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
-  .ball-wrap.show { opacity: 1; transform: translateY(0) scale(1); }
+  .ball-wrap { display: flex; flex-direction: column; align-items: center; gap: 6px; animation: ballIn 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+  @keyframes ballIn { from { opacity: 0; transform: translateY(20px) scale(0.7); } to { opacity: 1; transform: translateY(0) scale(1); } }
   .ball { width: 72px; height: 72px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Black Han Sans', sans-serif; font-size: 1.5rem; color: white; position: relative; box-shadow: 0 6px 16px rgba(0,0,0,0.4), inset 0 -4px 8px rgba(0,0,0,0.2), inset 0 4px 8px rgba(255,255,255,0.2); }
   .ball::after { content: ''; position: absolute; top: 14%; left: 22%; width: 28%; height: 18%; background: rgba(255,255,255,0.35); border-radius: 50%; filter: blur(3px); }
   .ball-label { font-size: 0.62rem; color: var(--muted); letter-spacing: 1px; }
+
+  /* 4D display */
+  .fourd-list { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+  .fourd-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02)); border: 1px solid var(--border); border-radius: 14px; padding: 14px 18px; animation: ballIn 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+  .fourd-digits { display: flex; gap: 6px; }
+  .fourd-digit { width: 44px; height: 56px; border-radius: 10px; background: linear-gradient(135deg, var(--gold2), var(--gold)); color: #0a0a12; display: flex; align-items: center; justify-content: center; font-family: 'Black Han Sans', sans-serif; font-size: 1.8rem; box-shadow: 0 4px 12px rgba(255,180,0,0.25), inset 0 -3px 6px rgba(0,0,0,0.15), inset 0 3px 6px rgba(255,255,255,0.2); }
+  .fourd-save { background: none; border: 1px solid var(--border); color: var(--muted); width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 1.1rem; }
+  .fourd-save.saved { background: rgba(255,215,0,0.15); border-color: var(--gold); color: var(--gold); }
+
   .placeholder { text-align: center; color: var(--muted); font-size: 0.9rem; line-height: 1.7; }
   .placeholder .big { font-size: 2.5rem; display: block; margin-bottom: 8px; }
   .btn { width: 100%; background: linear-gradient(135deg, var(--gold2), var(--gold)); color: #0a0a12; border: none; border-radius: 16px; padding: 18px; font-family: 'Black Han Sans', sans-serif; font-size: 1.05rem; letter-spacing: 2px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 6px 24px rgba(255,180,0,0.3); transition: transform 0.12s; }
@@ -88,10 +107,13 @@
   .btn-row .btn { flex: 1; }
   .hint { font-size: 0.72rem; color: var(--muted); text-align: center; margin-top: 12px; letter-spacing: 0.3px; }
   .tap-hint { font-size: 0.78rem; color: var(--gold); text-align: center; margin: 0 0 16px; font-weight: 600; letter-spacing: 0.3px; }
+
   .saved-pick { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px; margin-bottom: 8px; }
   .saved-pick .meta { font-size: 0.7rem; color: var(--muted); width: 100%; margin-bottom: 4px; display: flex; justify-content: space-between; }
   .saved-pick .num { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; }
+  .saved-pick .fourd { font-family: 'Black Han Sans', sans-serif; font-size: 1.4rem; letter-spacing: 4px; color: var(--gold); }
   .del-btn { background: none; border: none; color: var(--muted); font-size: 1rem; cursor: pointer; padding: 2px 4px; }
+
   .draw-card { background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02)); border: 1px solid var(--border); border-radius: 18px; padding: 18px; margin-bottom: 12px; }
   .draw-card.latest { background: linear-gradient(135deg, rgba(255,180,0,0.08), rgba(255,90,180,0.04)); border-color: rgba(255,180,0,0.3); }
   .draw-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
@@ -103,6 +125,16 @@
   .draw-num.bonus { background: linear-gradient(135deg, var(--gold2), var(--gold)); color: #0a0a12; border: none; }
   .plus-sign { color: var(--muted); font-size: 1rem; margin: 0 4px; }
   .bonus-label { font-size: 0.65rem; color: var(--muted); letter-spacing: 0.5px; margin-left: 4px; }
+
+  /* 4D draw card */
+  .fourd-prize-row { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+  .fourd-prize-row:last-child { margin-bottom: 0; }
+  .fourd-prize-label { font-size: 0.7rem; color: var(--muted); width: 70px; letter-spacing: 0.5px; text-transform: uppercase; font-weight: 700; }
+  .fourd-prize-num { font-family: 'Black Han Sans', sans-serif; font-size: 1.5rem; letter-spacing: 4px; }
+  .fourd-prize-num.first { color: var(--gold); }
+  .fourd-prize-num.second { color: var(--text); }
+  .fourd-prize-num.third { color: var(--muted); }
+
   .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
   .stat-tile { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px; }
   .stat-tile .label { font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
@@ -110,8 +142,11 @@
   .stat-tile .nums .n { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; }
   .stat-tile .n.hot { background: rgba(255,94,87,0.15); color: var(--red); border: 1px solid rgba(255,94,87,0.3); }
   .stat-tile .n.cold { background: rgba(96,165,250,0.15); color: var(--blue); border: 1px solid rgba(96,165,250,0.3); }
+
   .check-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin: 12px 0; }
+  .check-grid.fourd { grid-template-columns: repeat(4, 1fr); max-width: 280px; }
   .check-input { aspect-ratio: 1; background: var(--surface); border: 1.5px solid var(--border); border-radius: 50%; text-align: center; font-family: 'Black Han Sans', sans-serif; font-size: 1rem; color: var(--text); -moz-appearance: textfield; -webkit-appearance: none; }
+  .check-input.fourd-input { border-radius: 10px; aspect-ratio: 0.85; font-size: 1.4rem; }
   .check-input::-webkit-outer-spin-button, .check-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
   .check-input:focus { border-color: var(--gold); outline: none; }
   .check-input.bonus-input { border-color: rgba(255,180,0,0.4); }
@@ -120,6 +155,7 @@
   .check-result.miss { background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02)); border-color: var(--border); }
   .check-result .big-num { font-family: 'Black Han Sans', sans-serif; font-size: 2.5rem; color: var(--gold); }
   .check-result .msg { font-size: 0.9rem; color: var(--text); margin-top: 4px; }
+
   .profile-list { margin-bottom: 16px; }
   .profile-row { display: flex; align-items: center; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 12px; margin-bottom: 8px; cursor: pointer; }
   .profile-row.current { border-color: rgba(255,180,0,0.4); background: linear-gradient(135deg, rgba(255,180,0,0.08), transparent); }
@@ -128,22 +164,26 @@
   .profile-row .info .nm { font-weight: 700; }
   .profile-row .info .bd { font-size: 0.78rem; color: var(--muted); }
   .profile-row .current-badge { background: var(--gold); color: #0a0a12; font-size: 0.65rem; padding: 3px 8px; border-radius: 999px; font-weight: 700; letter-spacing: 0.5px; }
+
   .form-group { margin-bottom: 14px; }
   .form-group label { display: block; font-size: 0.78rem; color: var(--muted); margin-bottom: 6px; letter-spacing: 0.5px; }
   .form-group input, .form-group select { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px; color: var(--text); font-size: 0.95rem; font-family: inherit; }
   .form-group input:focus, .form-group select:focus { border-color: var(--gold); outline: none; }
   .form-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+
   .tab-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10,10,18,0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 10px 0 calc(10px + env(safe-area-inset-bottom)); z-index: 100; }
   .tab-btn { background: none; border: none; color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px 12px; font-size: 0.68rem; font-family: inherit; font-weight: 600; cursor: pointer; transition: color 0.2s; letter-spacing: 0.3px; }
   .tab-btn .ic { font-size: 1.4rem; }
   .tab-btn.active { color: var(--gold); }
   .tab-btn.active .ic { transform: scale(1.1); }
+
   .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 200; display: none; align-items: flex-end; justify-content: center; }
   .modal-bg.open { display: flex; }
   .modal { background: var(--bg2); border-radius: 22px 22px 0 0; border-top: 1px solid var(--border); width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; padding: 24px 20px calc(32px + env(safe-area-inset-bottom)); animation: slideUp 0.3s ease; }
   @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
   .modal-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 18px; }
   .modal h3 { font-family: 'Black Han Sans', sans-serif; font-size: 1.3rem; margin-bottom: 16px; }
+
   .setup { min-height: 90vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
   .setup .big-emoji { font-size: 4rem; margin-bottom: 16px; }
   .setup h2 { font-family: 'Black Han Sans', sans-serif; font-size: 1.8rem; color: var(--gold); margin-bottom: 8px; }
@@ -151,6 +191,7 @@
   .setup .form-container { width: 100%; max-width: 360px; }
   .disclaimer { font-size: 0.7rem; color: var(--dim); text-align: center; padding: 16px; line-height: 1.5; }
   .my-text { font-family: 'Noto Sans Myanmar', sans-serif; }
+
   .install-banner { position: fixed; top: env(safe-area-inset-top); left: 0; right: 0; background: linear-gradient(135deg, rgba(255,180,0,0.95), rgba(255,210,0,0.95)); color: #0a0a12; padding: 12px 16px; display: none; align-items: center; gap: 10px; z-index: 150; font-size: 0.85rem; font-weight: 600; }
   .install-banner.show { display: flex; }
   .install-banner button { background: rgba(10,10,18,0.15); border: none; color: #0a0a12; padding: 6px 12px; border-radius: 8px; font-weight: 700; cursor: pointer; font-family: inherit; }
@@ -190,20 +231,20 @@
 
 <div id="mainApp" class="app" style="display:none">
   <div class="top-bar">
-    <div class="logo">LUCKY<span class="dot">·</span>DRAW</div>
+    <div class="logo">LUCKY<span class="dot">·</span>DRAW<span class="ver">v3</span></div>
     <div class="profile-chip" onclick="showTab('profile')">
       <div class="avatar" id="profileAvatar">A</div>
       <span id="profileName">—</span>
     </div>
   </div>
 
+  <!-- TODAY -->
   <div id="view-today" class="view active">
     <div class="greeting">
       <div class="hi">Mingalaba 🙏</div>
       <div class="name" id="greetName">Friend</div>
       <div class="date" id="todayDate">—</div>
     </div>
-
     <div class="card luck-score-card">
       <div class="luck-score" id="luckScore">--</div>
       <div class="luck-bar"><div class="luck-bar-fill" id="luckBar" style="width: 0%"></div></div>
@@ -211,7 +252,6 @@
       <div class="luck-score-label">Today's Luck Score · out of 100</div>
       <div class="luck-msg" id="luckMsg">—</div>
     </div>
-
     <div class="zodiac-row">
       <div class="zodiac-tile">
         <span class="emoji" id="westZodEmoji">⭐</span>
@@ -224,13 +264,11 @@
         <div class="sub">Chinese Zodiac</div>
       </div>
     </div>
-
     <div class="card" style="margin-top: 16px">
       <div class="card-title"><span class="ic">✨</span> Your Lucky Numbers Today</div>
       <div class="lucky-numbers" id="luckyNumbers"></div>
       <p class="hint" style="margin-top: 12px">Based on your birth date and today's date · changes daily</p>
     </div>
-
     <div class="card">
       <div class="card-title"><span class="ic">🔢</span> Your Life Path</div>
       <div style="display: flex; align-items: center; gap: 16px">
@@ -240,34 +278,60 @@
     </div>
   </div>
 
+  <!-- GENERATE -->
   <div id="view-generate" class="view">
     <h2 style="font-family: 'Black Han Sans', sans-serif; font-size: 1.6rem; margin-bottom: 4px;">Generate Numbers</h2>
     <p style="color: var(--muted); font-size: 0.85rem; margin-bottom: 18px;">Tap any strategy below to instantly generate</p>
 
-    <div class="strategy-pills" id="strategyPills">
-      <button class="pill active" data-strat="quick">🎲 Quick Pick</button>
-      <button class="pill" data-strat="lucky">✨ Lucky Pick</button>
-      <button class="pill" data-strat="hot">🔥 Hot Numbers</button>
-      <button class="pill" data-strat="cold">❄️ Cold Numbers</button>
-      <button class="pill" data-strat="balanced">⚖️ Balanced</button>
+    <div class="game-toggle" id="genGameToggle">
+      <button class="active" data-game="toto">🎯 TOTO</button>
+      <button data-game="fourd">🎰 4D</button>
     </div>
 
-    <p class="tap-hint" id="strategyDesc">👆 Tap any strategy above to generate</p>
-
-    <div class="balls-display" id="ballsDisplay">
-      <div class="placeholder" id="placeholder">
-        <span class="big">🎰</span>
-        Tap a strategy above to<br>generate your 6 lucky numbers
+    <!-- TOTO Section -->
+    <div id="gen-toto-section">
+      <div class="strategy-pills" id="totoStrategyPills">
+        <button class="pill active" data-strat="quick">🎲 Quick Pick</button>
+        <button class="pill" data-strat="lucky">✨ Lucky Pick</button>
+        <button class="pill" data-strat="hot">🔥 Hot Numbers</button>
+        <button class="pill" data-strat="cold">❄️ Cold Numbers</button>
+        <button class="pill" data-strat="balanced">⚖️ Balanced</button>
       </div>
+      <p class="tap-hint" id="totoStrategyDesc">👆 Tap any strategy above to generate</p>
+      <div class="balls-display" id="totoBallsDisplay">
+        <div class="placeholder">
+          <span class="big">🎰</span>
+          Tap a strategy above to<br>generate your 6 lucky numbers
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn" onclick="generateTOTO()">
+          <span>🎲</span> ROLL AGAIN
+        </button>
+        <button class="btn btn-secondary" onclick="saveTOTO()" id="totoSaveBtn" style="flex: 0 0 56px; padding: 18px 0;">💾</button>
+      </div>
+      <p class="hint">Tap 🎲 for new numbers · 💾 to save the ticket</p>
     </div>
 
-    <div class="btn-row">
-      <button class="btn" onclick="generate()">
-        <span id="btnIcon">🎲</span> ROLL AGAIN
+    <!-- 4D Section -->
+    <div id="gen-fourd-section" style="display:none">
+      <div class="strategy-pills" id="fourdStrategyPills">
+        <button class="pill active" data-strat="quick">🎲 Quick Pick</button>
+        <button class="pill" data-strat="birthday">🎂 Birthday</button>
+        <button class="pill" data-strat="lucky">✨ Lucky Pick</button>
+      </div>
+      <p class="tap-hint" id="fourdStrategyDesc">👆 Tap any strategy to generate 5 numbers</p>
+      <div id="fourdDisplay" style="min-height: 220px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+        <div class="placeholder">
+          <span class="big">🎰</span>
+          Tap a strategy above to<br>generate 5 lucky 4D numbers
+        </div>
+      </div>
+      <button class="btn" onclick="generate4D()">
+        <span>🎲</span> ROLL AGAIN
       </button>
-      <button class="btn btn-secondary" onclick="saveCurrent()" id="saveBtn" style="flex: 0 0 56px; padding: 18px 0;">💾</button>
+      <p class="hint">Each tap gives you 5 new 4D numbers · Tap ⭐ to save your favorites</p>
     </div>
-    <p class="hint">Tap 🎲 for new numbers with the same strategy · 💾 to save</p>
 
     <div class="card" id="savedPicksCard" style="margin-top: 20px; display: none;">
       <div class="card-title"><span class="ic">💾</span> Your Saved Tickets</div>
@@ -275,60 +339,89 @@
     </div>
   </div>
 
-  <div id="view-toto" class="view">
-    <h2 style="font-family: 'Black Han Sans', sans-serif; font-size: 1.6rem; margin-bottom: 4px;">TOTO Results</h2>
-    <p style="color: var(--muted); font-size: 0.85rem; margin-bottom: 18px;">Singapore Pools · Last 20 draws</p>
+  <!-- RESULTS -->
+  <div id="view-results" class="view">
+    <h2 style="font-family: 'Black Han Sans', sans-serif; font-size: 1.6rem; margin-bottom: 4px;">Results</h2>
+    <p style="color: var(--muted); font-size: 0.85rem; margin-bottom: 18px;">Singapore Pools draws</p>
 
-    <div class="card" style="background: linear-gradient(135deg, rgba(74,222,128,0.08), rgba(74,222,128,0.03)); border-color: rgba(74,222,128,0.2);">
-      <div class="card-title"><span class="ic">🎯</span> Check Your Numbers</div>
-      <p style="font-size: 0.82rem; color: var(--muted); margin-bottom: 10px;">Enter your 6 numbers to check against the latest draw</p>
-      <div class="check-grid">
-        <input type="number" class="check-input" min="1" max="49" id="chk0" inputmode="numeric">
-        <input type="number" class="check-input" min="1" max="49" id="chk1" inputmode="numeric">
-        <input type="number" class="check-input" min="1" max="49" id="chk2" inputmode="numeric">
-        <input type="number" class="check-input" min="1" max="49" id="chk3" inputmode="numeric">
-        <input type="number" class="check-input" min="1" max="49" id="chk4" inputmode="numeric">
-        <input type="number" class="check-input" min="1" max="49" id="chk5" inputmode="numeric">
-        <input type="number" class="check-input bonus-input" min="1" max="49" id="chk6" inputmode="numeric" placeholder="B">
-      </div>
-      <p class="hint" style="margin-bottom: 12px;">Your 6 numbers + last circle = bonus (optional)</p>
-      <button class="btn btn-secondary" onclick="checkNumbers()" style="background: var(--surface);">CHECK MATCHES</button>
-      <div class="check-result" id="checkResult"></div>
+    <div class="game-toggle" id="resGameToggle">
+      <button class="active" data-game="toto">🎯 TOTO</button>
+      <button data-game="fourd">🎰 4D</button>
     </div>
 
-    <div style="display: flex; justify-content: space-between; align-items: center; margin: 24px 0 12px;">
-      <h3 style="font-size: 1.1rem;">Recent Draws</h3>
-      <button class="pill" onclick="openAddDraw()" style="padding: 8px 14px; font-size: 0.78rem;">+ Add Draw</button>
+    <!-- TOTO Results -->
+    <div id="res-toto-section">
+      <div class="card" style="background: linear-gradient(135deg, rgba(74,222,128,0.08), rgba(74,222,128,0.03)); border-color: rgba(74,222,128,0.2);">
+        <div class="card-title"><span class="ic">🎯</span> Check Your TOTO Numbers</div>
+        <p style="font-size: 0.82rem; color: var(--muted); margin-bottom: 10px;">Enter your 6 numbers + bonus to check against the latest draw</p>
+        <div class="check-grid">
+          <input type="number" class="check-input" min="1" max="49" id="chk0" inputmode="numeric">
+          <input type="number" class="check-input" min="1" max="49" id="chk1" inputmode="numeric">
+          <input type="number" class="check-input" min="1" max="49" id="chk2" inputmode="numeric">
+          <input type="number" class="check-input" min="1" max="49" id="chk3" inputmode="numeric">
+          <input type="number" class="check-input" min="1" max="49" id="chk4" inputmode="numeric">
+          <input type="number" class="check-input" min="1" max="49" id="chk5" inputmode="numeric">
+          <input type="number" class="check-input bonus-input" min="1" max="49" id="chk6" inputmode="numeric" placeholder="B">
+        </div>
+        <p class="hint" style="margin-bottom: 12px;">Your 6 numbers + last circle = bonus (optional)</p>
+        <button class="btn btn-secondary" onclick="checkTOTO()" style="background: var(--surface);">CHECK MATCHES</button>
+        <div class="check-result" id="totoCheckResult"></div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin: 24px 0 12px;">
+        <h3 style="font-size: 1.1rem;">Recent TOTO Draws</h3>
+        <button class="pill" onclick="openAddTOTODraw()" style="padding: 8px 14px; font-size: 0.78rem;">+ Add</button>
+      </div>
+      <div id="totoDrawsList"></div>
+
+      <div class="card">
+        <div class="card-title"><span class="ic">📊</span> Historical Analysis</div>
+        <div class="stat-grid">
+          <div class="stat-tile">
+            <div class="label">🔥 Hottest 6</div>
+            <div class="nums" id="hotNums"></div>
+          </div>
+          <div class="stat-tile">
+            <div class="label">❄️ Coldest 6</div>
+            <div class="nums" id="coldNums"></div>
+          </div>
+        </div>
+        <p class="hint" style="margin-top: 12px; line-height: 1.5;">⚠️ Lottery draws are random. Past frequency doesn't predict future. Entertainment only!</p>
+      </div>
     </div>
 
-    <div id="drawsList"></div>
-
-    <div class="card">
-      <div class="card-title"><span class="ic">📊</span> Historical Analysis</div>
-      <div class="stat-grid">
-        <div class="stat-tile">
-          <div class="label">🔥 Hottest 6</div>
-          <div class="nums" id="hotNums"></div>
+    <!-- 4D Results -->
+    <div id="res-fourd-section" style="display:none">
+      <div class="card" style="background: linear-gradient(135deg, rgba(74,222,128,0.08), rgba(74,222,128,0.03)); border-color: rgba(74,222,128,0.2);">
+        <div class="card-title"><span class="ic">🎯</span> Check Your 4D Number</div>
+        <p style="font-size: 0.82rem; color: var(--muted); margin-bottom: 10px;">Enter your 4-digit number to check against the latest draw</p>
+        <div class="check-grid fourd">
+          <input type="number" class="check-input fourd-input" min="0" max="9" id="fdchk0" inputmode="numeric" maxlength="1">
+          <input type="number" class="check-input fourd-input" min="0" max="9" id="fdchk1" inputmode="numeric" maxlength="1">
+          <input type="number" class="check-input fourd-input" min="0" max="9" id="fdchk2" inputmode="numeric" maxlength="1">
+          <input type="number" class="check-input fourd-input" min="0" max="9" id="fdchk3" inputmode="numeric" maxlength="1">
         </div>
-        <div class="stat-tile">
-          <div class="label">❄️ Coldest 6</div>
-          <div class="nums" id="coldNums"></div>
-        </div>
+        <button class="btn btn-secondary" onclick="check4D()" style="background: var(--surface);">CHECK MATCHES</button>
+        <div class="check-result" id="fourdCheckResult"></div>
+        <p class="hint" style="margin-top: 8px;">Note: only checks against 1st/2nd/3rd prizes (not starter/consolation)</p>
       </div>
-      <p class="hint" style="margin-top: 12px; line-height: 1.5;">⚠️ Lottery draws are random. Past frequency doesn't predict future results. For entertainment only!</p>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin: 24px 0 12px;">
+        <h3 style="font-size: 1.1rem;">Recent 4D Draws</h3>
+        <button class="pill" onclick="openAdd4DDraw()" style="padding: 8px 14px; font-size: 0.78rem;">+ Add</button>
+      </div>
+      <div id="fourdDrawsList"></div>
     </div>
   </div>
 
+  <!-- PROFILE -->
   <div id="view-profile" class="view">
     <h2 style="font-family: 'Black Han Sans', sans-serif; font-size: 1.6rem; margin-bottom: 4px;">Profiles</h2>
     <p style="color: var(--muted); font-size: 0.85rem; margin-bottom: 18px;">Switch between profiles on this device</p>
-
     <div class="profile-list" id="profileList"></div>
-
     <button class="btn btn-secondary" onclick="openAddProfile()">
       <span>➕</span> ADD PROFILE
     </button>
-
     <div class="card" style="margin-top: 24px;">
       <div class="card-title"><span class="ic">💡</span> What is Luck Score?</div>
       <p style="font-size: 0.85rem; line-height: 1.6; color: var(--muted);">
@@ -338,16 +431,15 @@
         <span style="color: var(--muted);">60–74 = Good 🍀</span>
       </p>
     </div>
-
     <div class="card">
       <div class="card-title"><span class="ic">⚙️</span> About</div>
       <p style="font-size: 0.85rem; line-height: 1.6; color: var(--muted);">
-        Lucky Draw · Built with care 💛<br>
+        Lucky Draw <strong style="color: var(--gold);">v3</strong> · Built with care 💛<br>
         All data stored locally on your phone.<br>
-        Latest TOTO bundled: <strong style="color: var(--text);" id="latestDrawInfo">—</strong>
+        Latest TOTO: <strong style="color: var(--text);" id="latestTotoDrawInfo">—</strong><br>
+        Latest 4D: <strong style="color: var(--text);" id="latest4DDrawInfo">—</strong>
       </p>
     </div>
-
     <div class="disclaimer">
       🎲 For entertainment only. Lottery outcomes are random.<br>
       Please play responsibly. <span class="my-text">တာဝန်သိ ကစားကြပါ။</span>
@@ -358,7 +450,7 @@
 <div class="tab-bar" id="tabBar" style="display:none">
   <button class="tab-btn active" onclick="showTab('today')"><span class="ic">🌅</span><span>Today</span></button>
   <button class="tab-btn" onclick="showTab('generate')"><span class="ic">🎲</span><span>Generate</span></button>
-  <button class="tab-btn" onclick="showTab('toto')"><span class="ic">🎯</span><span>TOTO</span></button>
+  <button class="tab-btn" onclick="showTab('results')"><span class="ic">🎯</span><span>Results</span></button>
   <button class="tab-btn" onclick="showTab('profile')"><span class="ic">👤</span><span>Profile</span></button>
 </div>
 
@@ -370,6 +462,7 @@
 </div>
 
 <script>
+// ================= DATA =================
 const TOTO_HISTORY = [
   [4186, '2026-05-28', [10,13,30,35,38,44], 15],
   [4185, '2026-05-25', [11,12,24,33,38,46], 30],
@@ -393,23 +486,35 @@ const TOTO_HISTORY = [
   [4167, '2026-03-23', [4,25,28,33,43,48], 31],
 ];
 
+// 4D: [drawNo, date, firstPrize, secondPrize, thirdPrize]
+const FOURD_HISTORY = [
+  [5490, '2026-05-31', '1869', '7776', '8675'],
+];
+
 let state = {
   profiles: [], currentProfileId: null,
-  savedPicks: [], customDraws: [],
-  currentStrategy: 'quick', generatedNumbers: null,
+  savedPicks: [], customTOTODraws: [], custom4DDraws: [],
+  currentTOTOStrategy: 'quick', currentTOTONumbers: null,
+  current4DStrategy: 'quick', current4DNumbers: null,
+  currentGenGame: 'toto', currentResGame: 'toto',
   bannerDismissed: false,
 };
-const STORAGE_KEY = 'luckyDrawPro_v1';
+const STORAGE_KEY = 'luckyDrawPro_v3';
 
 function loadState() {
-  try { const raw = localStorage.getItem(STORAGE_KEY); if (raw) Object.assign(state, JSON.parse(raw)); }
-  catch (e) { console.error(e); }
+  try {
+    // Try v3 first, fall back to v1 for migration
+    let raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) raw = localStorage.getItem('luckyDrawPro_v1');
+    if (raw) Object.assign(state, JSON.parse(raw));
+  } catch (e) { console.error(e); }
 }
 function saveState() {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
   catch (e) { console.error(e); }
 }
 
+// ================= ZODIAC, NUMEROLOGY =================
 function getWesternZodiac(month, day) {
   const signs = [
     { name: 'Capricorn', emoji: '♑', from: '12-22', to: '1-19' },
@@ -433,7 +538,6 @@ function getWesternZodiac(month, day) {
   }
   return signs[0];
 }
-
 const CHINESE_ZODIAC = [
   { name: 'Rat', emoji: '🐀' }, { name: 'Ox', emoji: '🐂' },
   { name: 'Tiger', emoji: '🐅' }, { name: 'Rabbit', emoji: '🐇' },
@@ -443,7 +547,6 @@ const CHINESE_ZODIAC = [
   { name: 'Dog', emoji: '🐕' }, { name: 'Pig', emoji: '🐖' },
 ];
 function getChineseZodiac(year) { return CHINESE_ZODIAC[(year - 4) % 12]; }
-
 function getLifePath(month, day, year) {
   const digitSum = n => {
     while (n > 9 && ![11,22,33].includes(n)) {
@@ -453,7 +556,6 @@ function getLifePath(month, day, year) {
   };
   return digitSum(digitSum(month) + digitSum(day) + digitSum(year));
 }
-
 const LIFE_PATH_DESC = {
   1: 'The Leader — independent, ambitious, pioneering. You forge your own path.',
   2: 'The Diplomat — sensitive, cooperative, intuitive. You bring harmony.',
@@ -469,44 +571,27 @@ const LIFE_PATH_DESC = {
   33: 'The Master Teacher — selfless guide and uplifter of others.',
 };
 
+// ================= HELPERS =================
 function hashCode(str) {
   let h = 0;
   for (let i = 0; i < str.length; i++) { h = ((h << 5) - h) + str.charCodeAt(i); h |= 0; }
   return Math.abs(h);
 }
-
 function getDailyLuck(profile, dateStr) {
   const seed = `${profile.bdYear}-${profile.bdMonth}-${profile.bdDay}|${dateStr}`;
   const hash = hashCode(seed);
   const score = (hash % 41) + 60;
   const messages = {
-    excellent: [
-      'Stars are aligned. Today is yours! ⭐',
-      'Big energy today. Trust your instincts!',
-      'A wonderful day to take chances.',
-      'Fortune favors you today. Make a move!',
-    ],
-    great: [
-      'Solid day ahead. Good things coming your way!',
-      'Lucky vibes flowing. Smile more today 😊',
-      'Things will line up nicely today.',
-      'A day of small wins. Keep going!',
-    ],
-    good: [
-      'Steady as you go. A balanced day.',
-      'Nothing dramatic — just keep doing you.',
-      'Average is underrated. Enjoy the calm.',
-      'Patience pays off today.',
-    ],
+    excellent: ['Stars are aligned. Today is yours! ⭐', 'Big energy today. Trust your instincts!', 'A wonderful day to take chances.', 'Fortune favors you today. Make a move!'],
+    great: ['Solid day ahead. Good things coming your way!', 'Lucky vibes flowing. Smile more today 😊', 'Things will line up nicely today.', 'A day of small wins. Keep going!'],
+    good: ['Steady as you go. A balanced day.', 'Nothing dramatic — just keep doing you.', 'Average is underrated. Enjoy the calm.', 'Patience pays off today.'],
   };
   let bucket, tier;
   if (score >= 88) { bucket = 'excellent'; tier = 'EXCELLENT ⭐'; }
   else if (score >= 75) { bucket = 'great'; tier = 'GREAT 😊'; }
   else { bucket = 'good'; tier = 'GOOD 🍀'; }
-  const msg = messages[bucket][hash % messages[bucket].length];
-  return { score, msg, tier };
+  return { score, msg: messages[bucket][hash % messages[bucket].length], tier };
 }
-
 function getLuckyNumbers(profile, dateStr) {
   const seed = `${profile.bdYear}-${profile.bdMonth}-${profile.bdDay}|${dateStr}|lucky`;
   let h = hashCode(seed);
@@ -519,11 +604,10 @@ function getLuckyNumbers(profile, dateStr) {
   }
   return nums.sort((a,b) => a-b);
 }
-
 function computeFrequency() {
   const freq = {};
   for (let i = 1; i <= 49; i++) freq[i] = 0;
-  const allDraws = [...TOTO_HISTORY, ...state.customDraws];
+  const allDraws = [...TOTO_HISTORY, ...state.customTOTODraws];
   allDraws.forEach(d => d[2].forEach(n => freq[n]++));
   return freq;
 }
@@ -536,7 +620,6 @@ function getHotCold(n = 6) {
     cold: sorted.slice(-n).map(x => x[0]).sort((a,b) => a-b),
   };
 }
-
 function pickRandom(pool, n) {
   pool = [...pool];
   const out = [];
@@ -545,9 +628,25 @@ function pickRandom(pool, n) {
   }
   return out.sort((a,b) => a-b);
 }
-const STRATEGIES = {
+function currentProfile() { return state.profiles.find(p => p.id === state.currentProfileId); }
+function colorForNum(n) {
+  const palettes = [['#e74c3c','#c0392b'],['#e67e22','#d35400'],['#f39c12','#d4ac0d'],['#2ecc71','#27ae60'],['#3498db','#2980b9'],['#9b59b6','#8e44ad']];
+  return palettes[(n - 1) % 6];
+}
+function avatarColor(name) {
+  const colors = ['#e74c3c','#3498db','#2ecc71','#9b59b6','#f39c12','#1abc9c'];
+  return colors[hashCode(name || 'x') % colors.length];
+}
+function formatDate(iso) {
+  const d = new Date(iso);
+  return d.toLocaleDateString('en-SG', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+}
+function pad4(n) { return String(n).padStart(4, '0'); }
+
+// ================= TOTO STRATEGIES =================
+const TOTO_STRATEGIES = {
   quick: {
-    desc: '🎲 Quick Pick · Pure random, every number has equal chance',
+    desc: '🎲 Quick Pick · Pure random, equal chance for every number',
     run: () => pickRandom(Array.from({length:49}, (_,i)=>i+1), 6),
   },
   lucky: {
@@ -566,8 +665,7 @@ const STRATEGIES = {
     desc: '🔥 Hot Numbers · From the 15 most frequently drawn',
     run: () => {
       const freq = computeFrequency();
-      const top = Object.entries(freq).map(([k,v]) => [Number(k), v])
-        .sort((a,b) => b[1] - a[1]).slice(0, 15).map(x => x[0]);
+      const top = Object.entries(freq).map(([k,v]) => [Number(k), v]).sort((a,b) => b[1] - a[1]).slice(0, 15).map(x => x[0]);
       return pickRandom(top, 6);
     },
   },
@@ -575,8 +673,7 @@ const STRATEGIES = {
     desc: '❄️ Cold Numbers · From the 15 least drawn (might be "due"!)',
     run: () => {
       const freq = computeFrequency();
-      const bottom = Object.entries(freq).map(([k,v]) => [Number(k), v])
-        .sort((a,b) => a[1] - b[1]).slice(0, 15).map(x => x[0]);
+      const bottom = Object.entries(freq).map(([k,v]) => [Number(k), v]).sort((a,b) => a[1] - b[1]).slice(0, 15).map(x => x[0]);
       return pickRandom(bottom, 6);
     },
   },
@@ -589,33 +686,57 @@ const STRATEGIES = {
       const hot = all.slice(0, 12).map(x => x[0]);
       const cold = all.slice(-12).map(x => x[0]);
       const mid = all.slice(12, -12).map(x => x[0]);
-      return [
-        ...pickRandom(hot, 2),
-        ...pickRandom(cold, 2),
-        ...pickRandom(mid, 2),
-      ].sort((a,b) => a-b);
+      return [...pickRandom(hot, 2), ...pickRandom(cold, 2), ...pickRandom(mid, 2)].sort((a,b) => a-b);
     },
   },
 };
 
-function currentProfile() { return state.profiles.find(p => p.id === state.currentProfileId); }
-function colorForNum(n) {
-  const palettes = [
-    ['#e74c3c', '#c0392b'], ['#e67e22', '#d35400'],
-    ['#f39c12', '#d4ac0d'], ['#2ecc71', '#27ae60'],
-    ['#3498db', '#2980b9'], ['#9b59b6', '#8e44ad'],
-  ];
-  return palettes[(n - 1) % 6];
-}
-function avatarColor(name) {
-  const colors = ['#e74c3c','#3498db','#2ecc71','#9b59b6','#f39c12','#1abc9c'];
-  return colors[hashCode(name || 'x') % colors.length];
-}
-function formatDate(iso) {
-  const d = new Date(iso);
-  return d.toLocaleDateString('en-SG', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
-}
+// ================= 4D STRATEGIES =================
+const FOURD_STRATEGIES = {
+  quick: {
+    desc: '🎲 Quick Pick · 5 pure random 4-digit numbers',
+    run: () => {
+      const out = [];
+      for (let i = 0; i < 5; i++) out.push(pad4(Math.floor(Math.random() * 10000)));
+      return out;
+    },
+  },
+  birthday: {
+    desc: '🎂 Birthday · 5 numbers built around your birth date',
+    run: () => {
+      const p = currentProfile();
+      const dd = String(p.bdDay).padStart(2, '0');
+      const mm = String(p.bdMonth).padStart(2, '0');
+      const yy = String(p.bdYear).slice(-2);
+      const yyyy = String(p.bdYear).slice(0, 2);
+      // Generate variations
+      const out = [
+        dd + mm,           // DDMM
+        mm + dd,           // MMDD
+        dd + yy,           // DDYY
+        yyyy + dd,         // YYDD
+        yy + mm,           // YYMM
+      ];
+      return out;
+    },
+  },
+  lucky: {
+    desc: '✨ Lucky Pick · Deterministic from your profile + today',
+    run: () => {
+      const p = currentProfile();
+      const today = new Date().toISOString().slice(0,10);
+      const out = [];
+      for (let i = 0; i < 5; i++) {
+        const seed = `${p.bdYear}-${p.bdMonth}-${p.bdDay}|${today}|4d|${i}|${Math.random()}`;
+        const h = hashCode(seed);
+        out.push(pad4(h % 10000));
+      }
+      return out;
+    },
+  },
+};
 
+// ================= RENDER =================
 function renderAll() {
   const p = currentProfile();
   if (!p) return;
@@ -624,7 +745,7 @@ function renderAll() {
   document.getElementById('profileName').textContent = p.name;
   renderToday();
   renderGenerate();
-  renderTOTO();
+  renderResults();
   renderProfile();
 }
 
@@ -660,7 +781,9 @@ function renderToday() {
 }
 
 function renderGenerate() {
-  document.getElementById('strategyDesc').textContent = STRATEGIES[state.currentStrategy].desc;
+  document.getElementById('totoStrategyDesc').textContent = TOTO_STRATEGIES[state.currentTOTOStrategy].desc;
+  document.getElementById('fourdStrategyDesc').textContent = FOURD_STRATEGIES[state.current4DStrategy].desc;
+
   const list = document.getElementById('savedPicksList');
   const card = document.getElementById('savedPicksCard');
   const profilePicks = state.savedPicks.filter(p => p.profileId === state.currentProfileId);
@@ -672,17 +795,25 @@ function renderGenerate() {
     row.className = 'saved-pick';
     const meta = document.createElement('div');
     meta.className = 'meta';
-    meta.innerHTML = `<span>${pick.strategy} · ${formatDate(pick.savedAt)}</span><button class="del-btn" data-id="${pick.id}">×</button>`;
+    const gameLbl = pick.game === '4d' ? '🎰 4D' : '🎯 TOTO';
+    meta.innerHTML = `<span>${gameLbl} · ${pick.strategy} · ${formatDate(pick.savedAt)}</span><button class="del-btn" data-id="${pick.id}">×</button>`;
     row.appendChild(meta);
-    pick.nums.forEach(n => {
-      const c = colorForNum(n);
-      const el = document.createElement('div');
-      el.className = 'num';
-      el.style.background = `linear-gradient(135deg, ${c[0]}, ${c[1]})`;
-      el.style.color = 'white';
-      el.textContent = n < 10 ? '0' + n : n;
-      row.appendChild(el);
-    });
+    if (pick.game === '4d') {
+      const span = document.createElement('div');
+      span.className = 'fourd';
+      span.textContent = pick.num;
+      row.appendChild(span);
+    } else {
+      pick.nums.forEach(n => {
+        const c = colorForNum(n);
+        const el = document.createElement('div');
+        el.className = 'num';
+        el.style.background = `linear-gradient(135deg, ${c[0]}, ${c[1]})`;
+        el.style.color = 'white';
+        el.textContent = n < 10 ? '0' + n : n;
+        row.appendChild(el);
+      });
+    }
     list.appendChild(row);
   });
   list.querySelectorAll('.del-btn').forEach(b => {
@@ -695,20 +826,18 @@ function renderGenerate() {
   });
 }
 
-function renderTOTO() {
-  const all = [...state.customDraws, ...TOTO_HISTORY].sort((a,b) => b[0] - a[0]);
-  const list = document.getElementById('drawsList');
-  list.innerHTML = '';
-  all.slice(0, 25).forEach((draw, idx) => {
+function renderResults() {
+  // TOTO draws
+  const allToto = [...state.customTOTODraws, ...TOTO_HISTORY].sort((a,b) => b[0] - a[0]);
+  const totoList = document.getElementById('totoDrawsList');
+  totoList.innerHTML = '';
+  allToto.slice(0, 25).forEach((draw, idx) => {
     const [drawNo, date, nums, bonus] = draw;
     const card = document.createElement('div');
     card.className = 'draw-card' + (idx === 0 ? ' latest' : '');
     const meta = document.createElement('div');
     meta.className = 'draw-meta';
-    meta.innerHTML = `
-      <div class="date">${formatDate(date)}</div>
-      <div class="badge ${idx === 0 ? 'latest-badge' : ''}">${idx === 0 ? '✨ LATEST' : '#' + drawNo}</div>
-    `;
+    meta.innerHTML = `<div class="date">${formatDate(date)}</div><div class="badge ${idx === 0 ? 'latest-badge' : ''}">${idx === 0 ? '✨ LATEST' : '#' + drawNo}</div>`;
     card.appendChild(meta);
     const balls = document.createElement('div');
     balls.className = 'draw-balls';
@@ -731,7 +860,7 @@ function renderTOTO() {
     lbl.textContent = 'BONUS';
     balls.appendChild(lbl);
     card.appendChild(balls);
-    list.appendChild(card);
+    totoList.appendChild(card);
   });
   const { hot, cold } = getHotCold(6);
   const hotEl = document.getElementById('hotNums');
@@ -739,7 +868,40 @@ function renderTOTO() {
   hotEl.innerHTML = ''; coldEl.innerHTML = '';
   hot.forEach(n => { const el = document.createElement('div'); el.className = 'n hot'; el.textContent = n < 10 ? '0' + n : n; hotEl.appendChild(el); });
   cold.forEach(n => { const el = document.createElement('div'); el.className = 'n cold'; el.textContent = n < 10 ? '0' + n : n; coldEl.appendChild(el); });
-  document.getElementById('latestDrawInfo').textContent = formatDate(all[0][1]);
+
+  // 4D draws
+  const all4D = [...state.custom4DDraws, ...FOURD_HISTORY].sort((a,b) => b[0] - a[0]);
+  const fourdList = document.getElementById('fourdDrawsList');
+  fourdList.innerHTML = '';
+  all4D.slice(0, 25).forEach((draw, idx) => {
+    const [drawNo, date, first, second, third] = draw;
+    const card = document.createElement('div');
+    card.className = 'draw-card' + (idx === 0 ? ' latest' : '');
+    const meta = document.createElement('div');
+    meta.className = 'draw-meta';
+    meta.innerHTML = `<div class="date">${formatDate(date)}</div><div class="badge ${idx === 0 ? 'latest-badge' : ''}">${idx === 0 ? '✨ LATEST' : '#' + drawNo}</div>`;
+    card.appendChild(meta);
+    const inner = document.createElement('div');
+    inner.innerHTML = `
+      <div class="fourd-prize-row">
+        <span class="fourd-prize-label">1st</span>
+        <span class="fourd-prize-num first">${first}</span>
+      </div>
+      <div class="fourd-prize-row">
+        <span class="fourd-prize-label">2nd</span>
+        <span class="fourd-prize-num second">${second}</span>
+      </div>
+      <div class="fourd-prize-row">
+        <span class="fourd-prize-label">3rd</span>
+        <span class="fourd-prize-num third">${third}</span>
+      </div>
+    `;
+    card.appendChild(inner);
+    fourdList.appendChild(card);
+  });
+
+  document.getElementById('latestTotoDrawInfo').textContent = formatDate(allToto[0][1]);
+  document.getElementById('latest4DDrawInfo').textContent = all4D.length ? formatDate(all4D[0][1]) : 'None yet';
 }
 
 function renderProfile() {
@@ -777,14 +939,11 @@ function renderProfile() {
   });
 }
 
-let isAnimating = false;
-function generate() {
-  if (isAnimating) return;
-  isAnimating = true;
-  const nums = STRATEGIES[state.currentStrategy].run();
-  state.generatedNumbers = nums;
-  document.getElementById('placeholder').style.display = 'none';
-  const display = document.getElementById('ballsDisplay');
+// ================= TOTO GENERATE =================
+function generateTOTO() {
+  const nums = TOTO_STRATEGIES[state.currentTOTOStrategy].run();
+  state.currentTOTONumbers = nums;
+  const display = document.getElementById('totoBallsDisplay');
   display.innerHTML = '';
   const grid = document.createElement('div');
   grid.className = 'balls-grid';
@@ -792,6 +951,7 @@ function generate() {
   nums.forEach((n, i) => {
     const wrap = document.createElement('div');
     wrap.className = 'ball-wrap';
+    wrap.style.animationDelay = (i * 0.08) + 's';
     const c = colorForNum(n);
     const ball = document.createElement('div');
     ball.className = 'ball';
@@ -803,29 +963,81 @@ function generate() {
     wrap.appendChild(ball);
     wrap.appendChild(lbl);
     grid.appendChild(wrap);
-    setTimeout(() => wrap.classList.add('show'), i * 110);
   });
-  setTimeout(() => isAnimating = false, nums.length * 110 + 400);
 }
 
-function saveCurrent() {
-  if (!state.generatedNumbers) { alert('Generate some numbers first!'); return; }
+function saveTOTO() {
+  if (!state.currentTOTONumbers) { alert('Generate some numbers first!'); return; }
   state.savedPicks.push({
     id: 'pick_' + Date.now(),
     profileId: state.currentProfileId,
-    nums: state.generatedNumbers,
-    strategy: state.currentStrategy,
+    game: 'toto',
+    nums: state.currentTOTONumbers,
+    strategy: state.currentTOTOStrategy,
     savedAt: new Date().toISOString(),
   });
   saveState();
   renderGenerate();
-  const btn = document.getElementById('saveBtn');
-  const orig = btn.innerHTML;
-  btn.innerHTML = '✓';
+  const btn = document.getElementById('totoSaveBtn');
+  const orig = btn.innerHTML; btn.innerHTML = '✓';
   setTimeout(() => btn.innerHTML = orig, 800);
 }
 
-function checkNumbers() {
+// ================= 4D GENERATE =================
+function generate4D() {
+  const nums = FOURD_STRATEGIES[state.current4DStrategy].run();
+  state.current4DNumbers = nums;
+  const display = document.getElementById('fourdDisplay');
+  display.innerHTML = '';
+  const wrap = document.createElement('div');
+  wrap.className = 'fourd-list';
+  display.appendChild(wrap);
+  nums.forEach((n, i) => {
+    const row = document.createElement('div');
+    row.className = 'fourd-row';
+    row.style.animationDelay = (i * 0.08) + 's';
+    const digits = document.createElement('div');
+    digits.className = 'fourd-digits';
+    [...n].forEach(d => {
+      const el = document.createElement('div');
+      el.className = 'fourd-digit';
+      el.textContent = d;
+      digits.appendChild(el);
+    });
+    const isSaved = state.savedPicks.some(p => p.profileId === state.currentProfileId && p.game === '4d' && p.num === n);
+    const save = document.createElement('button');
+    save.className = 'fourd-save' + (isSaved ? ' saved' : '');
+    save.innerHTML = isSaved ? '⭐' : '☆';
+    save.title = 'Save this number';
+    save.onclick = () => save4D(n, save);
+    row.appendChild(digits);
+    row.appendChild(save);
+    wrap.appendChild(row);
+  });
+}
+
+function save4D(num, btn) {
+  const existing = state.savedPicks.find(p => p.profileId === state.currentProfileId && p.game === '4d' && p.num === num);
+  if (existing) {
+    state.savedPicks = state.savedPicks.filter(p => p.id !== existing.id);
+    btn.innerHTML = '☆'; btn.classList.remove('saved');
+  } else {
+    state.savedPicks.push({
+      id: 'pick_' + Date.now(),
+      profileId: state.currentProfileId,
+      game: '4d',
+      num,
+      strategy: state.current4DStrategy,
+      savedAt: new Date().toISOString(),
+    });
+    btn.innerHTML = '⭐'; btn.classList.add('saved');
+  }
+  saveState();
+  renderGenerate();
+}
+
+// ================= CHECK =================
+function checkTOTO() {
   const inputs = [];
   for (let i = 0; i < 6; i++) {
     const v = parseInt(document.getElementById('chk' + i).value);
@@ -834,16 +1046,15 @@ function checkNumbers() {
   }
   if (new Set(inputs).size !== 6) { alert('Numbers must be unique'); return; }
   const bonusGuess = parseInt(document.getElementById('chk6').value);
-  const all = [...state.customDraws, ...TOTO_HISTORY].sort((a,b) => b[0] - a[0]);
+  const all = [...state.customTOTODraws, ...TOTO_HISTORY].sort((a,b) => b[0] - a[0]);
   const [drawNo, date, winning, bonus] = all[0];
   const matches = inputs.filter(n => winning.includes(n));
   const bonusMatch = !isNaN(bonusGuess) && bonusGuess === bonus;
-  const res = document.getElementById('checkResult');
+  const res = document.getElementById('totoCheckResult');
   res.classList.add('show');
   res.classList.toggle('miss', matches.length < 3);
   let prize = '';
-  const m = matches.length;
-  const b = bonusMatch ? 1 : 0;
+  const m = matches.length, b = bonusMatch ? 1 : 0;
   if (m === 6) prize = '🎉 GROUP 1 — JACKPOT!! 🎉';
   else if (m === 5 && b) prize = '🥈 Group 2 prize!';
   else if (m === 5) prize = '🥉 Group 3 prize!';
@@ -852,28 +1063,38 @@ function checkNumbers() {
   else if (m === 3 && b) prize = '💰 Group 6 prize ($25)';
   else if (m === 3) prize = '💵 Group 7 prize ($10)';
   else prize = 'No prize this time — try again! 🍀';
-  res.innerHTML = `
-    <div class="big-num">${m}/6</div>
-    <div class="msg">${prize}</div>
-    <div style="font-size: 0.78rem; color: var(--muted); margin-top: 8px;">
-      Checked against ${formatDate(date)} (Draw #${drawNo})
-      ${bonusMatch ? '<br>✨ You matched the bonus too!' : ''}
-    </div>
-  `;
+  res.innerHTML = `<div class="big-num">${m}/6</div><div class="msg">${prize}</div><div style="font-size: 0.78rem; color: var(--muted); margin-top: 8px;">Checked against ${formatDate(date)} (Draw #${drawNo})${bonusMatch ? '<br>✨ You matched the bonus too!' : ''}</div>`;
 }
 
-function openAddDraw() {
+function check4D() {
+  const digits = [];
+  for (let i = 0; i < 4; i++) {
+    const v = document.getElementById('fdchk' + i).value;
+    if (v === '' || isNaN(parseInt(v)) || parseInt(v) < 0 || parseInt(v) > 9) { alert('Please enter all 4 digits (0-9)'); return; }
+    digits.push(v);
+  }
+  const myNum = digits.join('');
+  const all = [...state.custom4DDraws, ...FOURD_HISTORY].sort((a,b) => b[0] - a[0]);
+  if (all.length === 0) { alert('No 4D draws available yet'); return; }
+  const [drawNo, date, first, second, third] = all[0];
+  let prize = '', match = false;
+  if (myNum === first) { prize = '🎉 1st PRIZE — $2,000! 🎉'; match = true; }
+  else if (myNum === second) { prize = '🥈 2nd PRIZE — $1,000!'; match = true; }
+  else if (myNum === third) { prize = '🥉 3rd PRIZE — $490!'; match = true; }
+  else prize = 'No match in top 3 — could still be starter/consolation! 🍀';
+  const res = document.getElementById('fourdCheckResult');
+  res.classList.add('show');
+  res.classList.toggle('miss', !match);
+  res.innerHTML = `<div class="big-num">${myNum}</div><div class="msg">${prize}</div><div style="font-size: 0.78rem; color: var(--muted); margin-top: 8px;">Checked against ${formatDate(date)} (Draw #${drawNo})</div>`;
+}
+
+// ================= MODALS =================
+function openAddTOTODraw() {
   const html = `
-    <h3>Add Latest Draw</h3>
-    <p style="font-size: 0.85rem; color: var(--muted); margin-bottom: 16px;">Enter latest TOTO numbers from Singapore Pools.</p>
-    <div class="form-group">
-      <label>Draw Date</label>
-      <input type="date" id="addDrawDate">
-    </div>
-    <div class="form-group">
-      <label>Draw Number (optional)</label>
-      <input type="number" id="addDrawNo" placeholder="e.g. 4187">
-    </div>
+    <h3>Add Latest TOTO Draw</h3>
+    <p style="font-size: 0.85rem; color: var(--muted); margin-bottom: 16px;">Enter latest TOTO numbers.</p>
+    <div class="form-group"><label>Draw Date</label><input type="date" id="addDrawDate"></div>
+    <div class="form-group"><label>Draw Number (optional)</label><input type="number" id="addDrawNo" placeholder="e.g. 4187"></div>
     <div class="form-group">
       <label>6 Winning Numbers + Bonus</label>
       <div class="check-grid">
@@ -887,15 +1108,14 @@ function openAddDraw() {
       </div>
       <p class="hint" style="margin-top: 4px;">Last circle = bonus number</p>
     </div>
-    <button class="btn" onclick="submitAddDraw()">SAVE DRAW</button>
+    <button class="btn" onclick="submitAddTOTODraw()">SAVE DRAW</button>
   `;
   showModal(html);
   setTimeout(() => document.getElementById('addDrawDate').value = new Date().toISOString().slice(0,10), 50);
 }
-
-function submitAddDraw() {
+function submitAddTOTODraw() {
   const date = document.getElementById('addDrawDate').value;
-  const drawNo = parseInt(document.getElementById('addDrawNo').value) || (Math.max(...[...TOTO_HISTORY, ...state.customDraws].map(d => d[0])) + 1);
+  const drawNo = parseInt(document.getElementById('addDrawNo').value) || (Math.max(...[...TOTO_HISTORY, ...state.customTOTODraws].map(d => d[0])) + 1);
   const nums = [];
   for (let i = 0; i < 6; i++) {
     const v = parseInt(document.getElementById('addN' + i).value);
@@ -907,10 +1127,40 @@ function submitAddDraw() {
   if (new Set([...nums, bonus]).size !== 7) { alert('All 7 numbers must be unique'); return; }
   if (!date) { alert('Pick a date'); return; }
   nums.sort((a,b) => a-b);
-  state.customDraws.push([drawNo, date, nums, bonus]);
+  state.customTOTODraws.push([drawNo, date, nums, bonus]);
   saveState();
   closeModal();
-  renderTOTO();
+  renderResults();
+}
+
+function openAdd4DDraw() {
+  const html = `
+    <h3>Add Latest 4D Draw</h3>
+    <p style="font-size: 0.85rem; color: var(--muted); margin-bottom: 16px;">Enter latest 4D top 3 prizes.</p>
+    <div class="form-group"><label>Draw Date</label><input type="date" id="add4DDate"></div>
+    <div class="form-group"><label>Draw Number (optional)</label><input type="number" id="add4DNo" placeholder="e.g. 5491"></div>
+    <div class="form-group"><label>1st Prize</label><input type="text" id="add4D1" maxlength="4" placeholder="e.g. 1234" inputmode="numeric" pattern="[0-9]{4}"></div>
+    <div class="form-group"><label>2nd Prize</label><input type="text" id="add4D2" maxlength="4" placeholder="e.g. 5678" inputmode="numeric" pattern="[0-9]{4}"></div>
+    <div class="form-group"><label>3rd Prize</label><input type="text" id="add4D3" maxlength="4" placeholder="e.g. 9012" inputmode="numeric" pattern="[0-9]{4}"></div>
+    <button class="btn" onclick="submitAdd4DDraw()">SAVE DRAW</button>
+  `;
+  showModal(html);
+  setTimeout(() => document.getElementById('add4DDate').value = new Date().toISOString().slice(0,10), 50);
+}
+function submitAdd4DDraw() {
+  const date = document.getElementById('add4DDate').value;
+  const drawNo = parseInt(document.getElementById('add4DNo').value) || (Math.max(0, ...[...FOURD_HISTORY, ...state.custom4DDraws].map(d => d[0])) + 1);
+  const first = document.getElementById('add4D1').value.padStart(4, '0');
+  const second = document.getElementById('add4D2').value.padStart(4, '0');
+  const third = document.getElementById('add4D3').value.padStart(4, '0');
+  if (!/^\d{4}$/.test(first) || !/^\d{4}$/.test(second) || !/^\d{4}$/.test(third)) {
+    alert('All 3 prizes must be 4-digit numbers (0000-9999)'); return;
+  }
+  if (!date) { alert('Pick a date'); return; }
+  state.custom4DDraws.push([drawNo, date, first, second, third]);
+  saveState();
+  closeModal();
+  renderResults();
 }
 
 function openAddProfile() {
@@ -922,18 +1172,11 @@ function openAddProfile() {
     <h3>Add Profile</h3>
     <p style="font-size: 0.85rem; color: var(--muted); margin-bottom: 16px;">Add your wife, family, or friend.</p>
     <div class="form-group"><label>Name</label><input type="text" id="newName" placeholder="e.g. Su Su" autocomplete="off"></div>
-    <div class="form-group"><label>Birth Date</label>
-      <div class="form-row">
-        <select id="newDay">${days}</select>
-        <select id="newMonth">${months}</select>
-        <select id="newYear">${years}</select>
-      </div>
-    </div>
+    <div class="form-group"><label>Birth Date</label><div class="form-row"><select id="newDay">${days}</select><select id="newMonth">${months}</select><select id="newYear">${years}</select></div></div>
     <button class="btn" onclick="submitAddProfile()">ADD PROFILE</button>
   `;
   showModal(html);
 }
-
 function submitAddProfile() {
   const name = document.getElementById('newName').value.trim();
   if (!name) { alert('Please enter a name'); return; }
@@ -954,33 +1197,30 @@ function showModal(html) {
   document.getElementById('modalContent').innerHTML = html;
   document.getElementById('modalBg').classList.add('open');
 }
-function closeModal() {
-  document.getElementById('modalBg').classList.remove('open');
-}
+function closeModal() { document.getElementById('modalBg').classList.remove('open'); }
 
+// ================= TABS =================
 function showTab(name) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.getElementById('view-' + name).classList.add('active');
   document.querySelectorAll('.tab-btn').forEach((b, i) => {
-    const names = ['today','generate','toto','profile'];
+    const names = ['today','generate','results','profile'];
     b.classList.toggle('active', names[i] === name);
   });
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+// ================= SETUP =================
 function initSetupForm() {
   const ds = document.getElementById('setupDay');
   const ms = document.getElementById('setupMonth');
   const ys = document.getElementById('setupYear');
   for (let i = 1; i <= 31; i++) ds.innerHTML += `<option value="${i}">${i}</option>`;
-  ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'].forEach((m,i) => {
-    ms.innerHTML += `<option value="${i+1}">${m}</option>`;
-  });
+  ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'].forEach((m,i) => { ms.innerHTML += `<option value="${i+1}">${m}</option>`; });
   const cy = new Date().getFullYear();
   for (let y = cy - 18; y > cy - 100; y--) ys.innerHTML += `<option value="${y}">${y}</option>`;
   ms.value = 1; ds.value = 15; ys.value = 1990;
 }
-
 function finishSetup() {
   const name = document.getElementById('setupName').value.trim();
   if (!name) { alert('Please enter your name'); return; }
@@ -1012,31 +1252,68 @@ function dismissBanner() {
   saveState();
 }
 
-// ============ STRATEGY PILLS — AUTO-GENERATE ON TAP (the fix!) ============
-document.querySelectorAll('.pill[data-strat]').forEach(btn => {
-  btn.onclick = () => {
-    document.querySelectorAll('.pill[data-strat]').forEach(b => b.classList.remove('active'));
+// ================= EVENT WIRING =================
+// TOTO Strategy Pills — auto-generate on tap
+document.querySelectorAll('#totoStrategyPills .pill').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#totoStrategyPills .pill').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    state.currentStrategy = btn.dataset.strat;
-    document.getElementById('strategyDesc').textContent = STRATEGIES[state.currentStrategy].desc;
-    generate(); // ⬅️ AUTO-generate immediately when strategy is tapped
-  };
+    state.currentTOTOStrategy = btn.dataset.strat;
+    document.getElementById('totoStrategyDesc').textContent = TOTO_STRATEGIES[state.currentTOTOStrategy].desc;
+    generateTOTO();
+  });
 });
 
-document.getElementById('modalBg').onclick = e => {
-  if (e.target.id === 'modalBg') closeModal();
-};
+// 4D Strategy Pills — auto-generate on tap
+document.querySelectorAll('#fourdStrategyPills .pill').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#fourdStrategyPills .pill').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    state.current4DStrategy = btn.dataset.strat;
+    document.getElementById('fourdStrategyDesc').textContent = FOURD_STRATEGIES[state.current4DStrategy].desc;
+    generate4D();
+  });
+});
 
-['chk0','chk1','chk2','chk3','chk4','chk5','chk6','addN0','addN1','addN2','addN3','addN4','addN5','addN6']
+// Game toggles
+document.querySelectorAll('#genGameToggle button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#genGameToggle button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    state.currentGenGame = btn.dataset.game;
+    document.getElementById('gen-toto-section').style.display = btn.dataset.game === 'toto' ? 'block' : 'none';
+    document.getElementById('gen-fourd-section').style.display = btn.dataset.game === 'fourd' ? 'block' : 'none';
+  });
+});
+document.querySelectorAll('#resGameToggle button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#resGameToggle button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    state.currentResGame = btn.dataset.game;
+    document.getElementById('res-toto-section').style.display = btn.dataset.game === 'toto' ? 'block' : 'none';
+    document.getElementById('res-fourd-section').style.display = btn.dataset.game === 'fourd' ? 'block' : 'none';
+  });
+});
+
+document.getElementById('modalBg').addEventListener('click', e => {
+  if (e.target.id === 'modalBg') closeModal();
+});
+
+// Auto-tab to next input
+['chk0','chk1','chk2','chk3','chk4','chk5','chk6','fdchk0','fdchk1','fdchk2','fdchk3','addN0','addN1','addN2','addN3','addN4','addN5','addN6']
   .forEach((id, idx, arr) => {
     document.addEventListener('input', e => {
-      if (e.target.id === id && e.target.value.length >= 2 && idx < arr.length - 1) {
-        const next = document.getElementById(arr[idx + 1]);
-        if (next) next.focus();
+      if (e.target.id === id) {
+        const maxLen = id.startsWith('fdchk') ? 1 : 2;
+        if (e.target.value.length >= maxLen && idx < arr.length - 1) {
+          const next = document.getElementById(arr[idx + 1]);
+          if (next) next.focus();
+        }
       }
     });
   });
 
+// ================= BOOT =================
 loadState();
 initSetupForm();
 if (state.profiles.length > 0 && state.currentProfileId) {
