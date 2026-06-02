@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0a0a12">
+
+<!-- PWA Manifest -->
+<link rel="manifest" href="manifest.json">
+
+<!-- iOS Add-to-Home-Screen support -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Lucky Draw">
+<link rel="apple-touch-icon" href="icon.svg">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+
+<title>Lucky Draw 🎱</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+Myanmar:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a12;
+    --bg2: #12121e;
+    --gold: #ffd700;
+    --gold2: #ffb300;
+    --gold-dark: #b8860b;
+    --surface: rgba(255,255,255,0.05);
+    --surface2: rgba(255,255,255,0.08);
+    --border: rgba(255,255,255,0.1);
+    --text: #f0f0fa;
+    --muted: #7a7a90;
+    --dim: #4a4a60;
+    --red: #ff5e57;
+    --green: #4ade80;
+    --blue: #60a5fa;
+    --purple: #c084fc;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; }
+  *:not(input):not(textarea) { user-select: none; }
+
+  html, body { height: 100%; overflow-x: hidden; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    position: relative;
+    padding-bottom: calc(90px + env(safe-area-inset-bottom));
+    padding-top: env(safe-area-inset-top);
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(circle at 20% 0%, rgba(255,180,0,0.08), transparent 50%),
+      radial-gradient(circle at 80% 100%, rgba(120,80,255,0.08), transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .app { position: relative; z-index: 1; max-width: 480px; margin: 0 auto; padding: 20px 18px 0; }
+
+  /* ============ HEADER ============ */
+  .top-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+  .logo { font-family: 'Black Han Sans', sans-serif; font-size: 1.3rem; color: var(--gold); letter-spacing: 1px; }
+  .logo .dot { color: var(--text); }
+  .profile-chip {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 999px;
+    padding: 8px 14px 8px 8px; display: flex; align-items: center; gap: 8px;
+    cursor: pointer; font-size: 0.85rem; font-weight: 600;
+  }
+  .avatar {
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 0.85rem; color: #0a0a12;
+  }
+
+  /* ============ TAB CONTENT ============ */
+  .view { display: none; animation: fadeIn 0.3s ease; }
+  .view.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ============ CARDS ============ */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 20px; margin-bottom: 16px; }
+  .card-title {
+    font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1.5px;
+    color: var(--muted); margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
+  }
+  .card-title .ic { font-size: 1rem; }
+
+  /* ============ TODAY VIEW ============ */
+  .greeting { margin-bottom: 24px; }
+  .greeting .hi { font-size: 0.9rem; color: var(--muted); }
+  .greeting .name { font-family: 'Black Han Sans', sans-serif; font-size: 2rem; line-height: 1.1; color: var(--text); }
+  .greeting .date { font-size: 0.85rem; color: var(--muted); margin-top: 4px; }
+
+  .luck-score-card {
+    background: linear-gradient(135deg, rgba(255,180,0,0.12), rgba(255,90,180,0.08));
+    border: 1px solid rgba(255,180,0,0.25);
+    text-align: center; padding: 28px 20px;
+  }
+  .luck-score {
+    font-family: 'Black Han Sans', sans-serif; font-size: 4.5rem;
+    background: linear-gradient(135deg, var(--gold2), var(--gold));
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent; line-height: 1;
+  }
+  .luck-score-label { font-size: 0.7rem; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-top: 8px; }
+  .luck-msg { font-size: 0.95rem; color: var(--text); margin-top: 14px; font-style: italic; }
+
+  .zodiac-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .zodiac-tile { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; text-align: center; }
+  .zodiac-tile .emoji { font-size: 2rem; display: block; margin-bottom: 6px; }
+  .zodiac-tile .name { font-weight: 700; font-size: 0.95rem; }
+  .zodiac-tile .sub { font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
+
+  .lucky-numbers { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 8px; }
+  .lucky-num {
+    width: 50px; height: 50px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold2), var(--gold));
+    color: #0a0a12; display: flex; align-items: center; justify-content: center;
+    font-family: 'Black Han Sans', sans-serif; font-size: 1.1rem;
+    box-shadow: 0 4px 12px rgba(255,180,0,0.3);
+  }
+
+  /* ============ GENERATE VIEW ============ */
+  .strategy-pills { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin: 0 -18px 16px; padding-left: 18px; padding-right: 18px; scrollbar-width: none; }
+  .strategy-pills::-webkit-scrollbar { display: none; }
+  .pill {
+    flex-shrink: 0; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 999px; padding: 10px 16px; font-size: 0.82rem;
+    font-weight: 600; cursor: pointer; color: var(--muted);
+    transition: all 0.2s; white-space: nowrap; font-family: inherit;
+  }
+  .pill.active {
+    background: linear-gradient(135deg, var(--gold2), var(--gold));
+    color: #0a0a12; border-color: transparent;
+    box-shadow: 0 3px 12px rgba(255,180,0,0.3);
+  }
+
+  .balls-display { min-height: 220px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; }
+  .balls-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; width: 100%; }
+  .ball-wrap { display: flex; flex-direction: column; align-items: center; gap: 6px; opacity: 0; transform: translateY(20px) scale(0.7); transition: opacity 0.4s, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .ball-wrap.show { opacity: 1; transform: translateY(0) scale(1); }
+  .ball {
+    width: 72px; height: 72px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Black Han Sans', sans-serif; font-size: 1.5rem; color: white;
+    position: relative;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.4), inset 0 -4px 8px rgba(0,0,0,0.2), inset 0 4px 8px rgba(255,255,255,0.2);
+  }
+  .ball::after { content: ''; position: absolute; top: 14%; left: 22%; width: 28%; height: 18%; background: rgba(255,255,255,0.35); border-radius: 50%; filter: blur(3px); }
+  .ball-label { font-size: 0.62rem; color: var(--muted); letter-spacing: 1px; }
+  .placeholder { text-align: center; color: var(--muted); font-size: 0.9rem; line-height: 1.7; }
+  .placeholder .big { font-size: 2.5rem; display: block; margin-bottom: 8px; }
+
+  .btn {
+    width: 100%; background: linear-gradient(135deg, var(--gold2), var(--gold));
+    color: #0a0a12; border: none; border-radius: 16px; padding: 18px;
+    font-family: 'Black Han Sans', sans-serif; font-size: 1.05rem; letter-spacing: 2px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
+    box-shadow: 0 6px 24px rgba(255,180,0,0.3); transition: transform 0.12s;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn-secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border); box-shadow: none; }
+  .btn-row { display: flex; gap: 10px; }
+  .btn-row .btn { flex: 1; }
+
+  .hint { font-size: 0.72rem; color: var(--muted); text-align: center; margin-top: 12px; letter-spacing: 0.3px; }
+
+  .saved-pick { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px; margin-bottom: 8px; }
+  .saved-pick .meta { font-size: 0.7rem; color: var(--muted); width: 100%; margin-bottom: 4px; display: flex; justify-content: space-between; }
+  .saved-pick .num { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; }
+  .del-btn { background: none; border: none; color: var(--muted); font-size: 1rem; cursor: pointer; padding: 2px 4px; }
+
+  /* ============ TOTO RESULTS VIEW ============ */
+  .draw-card { background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02)); border: 1px solid var(--border); border-radius: 18px; padding: 18px; margin-bottom: 12px; }
+  .draw-card.latest { background: linear-gradient(135deg, rgba(255,180,0,0.08), rgba(255,90,180,0.04)); border-color: rgba(255,180,0,0.3); }
+  .draw-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .draw-meta .date { font-weight: 700; font-size: 0.95rem; }
+  .draw-meta .badge { font-size: 0.7rem; color: var(--muted); padding: 2px 8px; border-radius: 999px; background: var(--surface); }
+  .draw-meta .badge.latest-badge { background: var(--gold); color: #0a0a12; font-weight: 700; }
+  .draw-balls { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .draw-num { width: 38px; height: 38px; border-radius: 50%; background: var(--surface2); display: flex; align-items: center; justify-content: center; font-family: 'Black Han Sans', sans-serif; font-size: 0.95rem; border: 1.5px solid var(--border); }
+  .draw-num.bonus { background: linear-gradient(135deg, var(--gold2), var(--gold)); color: #0a0a12; border: none; }
+  .plus-sign { color: var(--muted); font-size: 1rem; margin: 0 4px; }
+  .bonus-label { font-size: 0.65rem; color: var(--muted); letter-spacing: 0.5px; margin-left: 4px; }
+
+  .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .stat-tile { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px; }
+  .stat-tile .label { font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .stat-tile .nums { display: flex; gap: 4px; flex-wrap: wrap; }
+  .stat-tile .nums .n { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; }
+  .stat-tile .n.hot { background: rgba(255,94,87,0.15); color: var(--red); border: 1px solid rgba(255,94,87,0.3); }
+  .stat-tile .n.cold { background: rgba(96,165,250,0.15); color: var(--blue); border: 1px solid rgba(96,165,250,0.3); }
+
+  /* ============ CHECK NUMBERS ============ */
+  .check-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin: 12px 0; }
+  .check-input {
+    aspect-ratio: 1; background: var(--surface); border: 1.5px solid var(--border);
+    border-radius: 50%; text-align: center; font-family: 'Black Han Sans', sans-serif;
+    font-size: 1rem; color: var(--text); -moz-appearance: textfield; -webkit-appearance: none;
+  }
+  .check-input::-webkit-outer-spin-button, .check-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .check-input:focus { border-color: var(--gold); outline: none; }
+  .check-input.bonus-input { border-color: rgba(255,180,0,0.4); }
+
+  .check-result {
+    background: linear-gradient(135deg, rgba(74,222,128,0.1), rgba(74,222,128,0.05));
+    border: 1px solid rgba(74,222,128,0.3); border-radius: 14px; padding: 16px; margin-top: 12px;
+    text-align: center; display: none;
+  }
+  .check-result.show { display: block; }
+  .check-result.miss { background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02)); border-color: var(--border); }
+  .check-result .big-num { font-family: 'Black Han Sans', sans-serif; font-size: 2.5rem; color: var(--gold); }
+  .check-result .msg { font-size: 0.9rem; color: var(--text); margin-top: 4px; }
+
+  /* ============ PROFILE VIEW ============ */
+  .profile-list { margin-bottom: 16px; }
+  .profile-row { display: flex; align-items: center; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 12px; margin-bottom: 8px; cursor: pointer; }
+  .profile-row.current { border-color: rgba(255,180,0,0.4); background: linear-gradient(135deg, rgba(255,180,0,0.08), transparent); }
+  .profile-row .avatar { width: 42px; height: 42px; font-size: 1.1rem; }
+  .profile-row .info { flex: 1; }
+  .profile-row .info .nm { font-weight: 700; }
+  .profile-row .info .bd { font-size: 0.78rem; color: var(--muted); }
+  .profile-row .current-badge { background: var(--gold); color: #0a0a12; font-size: 0.65rem; padding: 3px 8px; border-radius: 999px; font-weight: 700; letter-spacing: 0.5px; }
+
+  .form-group { margin-bottom: 14px; }
+  .form-group label { display: block; font-size: 0.78rem; color: var(--muted); margin-bottom: 6px; letter-spacing: 0.5px; }
+  .form-group input, .form-group select {
+    width: 100%; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px; color: var(--text); font-size: 0.95rem; font-family: inherit;
+  }
+  .form-group input:focus, .form-group select:focus { border-color: var(--gold); outline: none; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+
+  /* ============ TAB BAR ============ */
+  .tab-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: rgba(10,10,18,0.92);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border);
+    display: flex; justify-content: space-around;
+    padding: 10px 0 calc(10px + env(safe-area-inset-bottom));
+    z-index: 100;
+  }
+  .tab-btn {
+    background: none; border: none; color: var(--muted);
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    padding: 6px 12px; font-size: 0.68rem; font-family: inherit; font-weight: 600;
+    cursor: pointer; transition: color 0.2s; letter-spacing: 0.3px;
+  }
+  .tab-btn .ic { font-size: 1.4rem; }
+  .tab-btn.active { color: var(--gold); }
+  .tab-btn.active .ic { transform: scale(1.1); }
+
+  /* ============ MODAL ============ */
+  .modal-bg {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(8px); z-index: 200; display: none;
+    align-items: flex-end; justify-content: center;
+  }
+  .modal-bg.open { display: flex; }
+  .modal {
+    background: var(--bg2); border-radius: 22px 22px 0 0; border-top: 1px solid var(--border);
+    width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto;
+    padding: 24px 20px calc(32px + env(safe-area-inset-bottom));
+    animation: slideUp 0.3s ease;
+  }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  .modal-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 18px; }
+  .modal h3 { font-family: 'Black Han Sans', sans-serif; font-size: 1.3rem; margin-bottom: 16px; }
+
+  /* ============ SETUP ============ */
+  .setup {
+    min-height: 90vh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center; padding: 20px;
+  }
+  .setup .big-emoji { font-size: 4rem; margin-bottom: 16px; }
+  .setup h2 { font-family: 'Black Han Sans', sans-serif; font-size: 1.8rem; color: var(--gold); margin-bottom: 8px; }
+  .setup p { color: var(--muted); margin-bottom: 24px; line-height: 1.5; }
+  .setup .form-container { width: 100%; max-width: 360px; }
+
+  .disclaimer { font-size: 0.7rem; color: var(--dim); text-align: center; padding: 16px; line-height: 1.5; }
+  .my-text { font-family: 'Noto Sans Myanmar', sans-serif; }
+
+  /* Install prompt banner */
+  .install-banner {
+    position: fixed; top: env(safe-area-inset-top); left: 0; right: 0;
+    background: linear-gradient(135deg, rgba(255,180,0,0.95), rgba(255,210,0,0.95));
+    color: #0a0a12; padding: 12px 16px; display: none;
+    align-items: center; gap: 10px; z-index: 150;
+    font-size: 0.85rem; font-weight: 600;
+  }
+  .install-banner.show { display: flex; }
+  .install-banner button { background: rgba(10,10,18,0.15); border: none; color: #0a0a12; padding: 6px 12px; border-radius: 8px; font-weight: 700; cursor: pointer; font-family: inherit; }
+  .install-banner .close-x { margin-left: auto; background: none; padding: 4px 8px; }
+</style>
+</head>
+<body>
+
+<!-- Install banner (iOS) -->
+<div class="install-banner" id="installBanner">
+  <span>📲</span>
+  <span>Tap Share → "Add to Home Screen" to install</span>
+  <button class="close-x" onclick="dismissBanner()">×</button>
+</div>
+
+<!-- SETUP SCREEN -->
+<div id="setupScreen" class="setup">
+  <div class="big-emoji">🎱</div>
+  <h2>LUCKY DRAW</h2>
+  <p>Welcome! Let's set up your profile.<br>Takes only 10 seconds.</p>
+  <div class="form-container">
+    <div class="form-group">
+      <label>Your Name</label>
+      <input id="setupName" type="text" placeholder="e.g. Aung Min" autocomplete="off">
+    </div>
+    <div class="form-group">
+      <label>Birth Date</label>
+      <div class="form-row">
+        <select id="setupDay"></select>
+        <select id="setupMonth"></select>
+        <select id="setupYear"></select>
+      </div>
+    </div>
+    <button class="btn" onclick="finishSetup()">
+      <span>🚀</span> GET STARTED
+    </button>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="mainApp" class="app" style="display:none">
+  <div class="top-bar">
+    <div class="logo">LUCKY<span class="dot">·</span>DRAW</div>
+    <div class="profile-chip" onclick="showTab('profile')">
+      <div class="avatar" id="profileAvatar">A</div>
+      <span id="profileName">—</span>
+    </div>
+  </div>
+
+  <!-- TODAY VIEW -->
+  <div id="view-today" class="view active">
+    <div class="greeting">
+      <div class="hi">Mingalaba 🙏</div>
+      <div class="name" id="greetName">Friend</div>
+      <div class="date" id="todayDate">—</div>
+    </div>
+
+    <div class="card luck-score-card">
+      <div class="luck-score" id="luckScore">--</div>
+      <div class="luck-score-label">Today's Luck Score</div>
+      <div class="luck-msg" id="luckMsg">—</div>
+    </div>
+
+    <div class="zodiac-row">
+      <div class="zodiac-tile">
+        <span class="emoji" id="westZodEmoji">⭐</span>
+        <div class="name" id="westZodName">—</div>
+        <div class="sub">Western Zodiac</div>
+      </div>
+      <div class="zodiac-tile">
+        <span class="emoji" id="chineseZodEmoji">🐉</span>
+        <div class="name" id="chineseZodName">—</div>
+        <div class="sub">Chinese Zodiac</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top: 16px">
+      <div class="card-title"><span class="ic">✨</span> Your Lucky Numbers Today</div>
+      <div class="lucky-numbers" id="luckyNumbers"></div>
+      <p class="hint" style="margin-top: 12px">Based on your birth date and today's date · changes daily</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="ic">🔢</span> Your Life Path</div>
+      <div style="display: flex; align-items: center; gap: 16px">
+        <div style="width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, var(--purple), var(--blue)); display: flex; align-items: center; justify-content: center; font-family: 'Black Han Sans', sans-serif; font-size: 2rem;" id="lifePathNum">—</div>
+        <div style="flex: 1; font-size: 0.85rem; line-height: 1.5;" id="lifePathDesc">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GENERATE VIEW -->
+  <div id="view-generate" class="view">
+    <h2 style="font-family: 'Black Han Sans', sans-serif; font-size: 1.6rem; margin-bottom: 4px;">Generate Numbers</h2>
+    <p style="color: var(--muted); font-size: 0.85rem; margin-bottom: 18px;">Pick a strategy and tap generate</p>
+
+    <div class="strategy-pills" id="strategyPills">
+      <button class="pill active" data-strat="quick">🎲 Quick Pick</button>
+      <button class="pill" data-strat="lucky">✨ Lucky Pick</button>
+      <button class="pill" data-strat="hot">🔥 Hot Numbers</button>
+      <button class="pill" data-strat="cold">❄️ Cold Numbers</button>
+      <button class="pill" data-strat="balanced">⚖️ Balanced</button>
+    </div>
+
+    <div class="balls-display" id="ballsDisplay">
+      <div class="placeholder" id="placeholder">
+        <span class="big">🎰</span>
+        Tap generate to pick<br>your 6 lucky numbers
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn" onclick="generate()">
+        <span id="btnIcon">🎲</span> GENERATE
+      </button>
+      <button class="btn btn-secondary" onclick="saveCurrent()" id="saveBtn" style="flex: 0 0 56px; padding: 18px 0;">💾</button>
+    </div>
+    <p class="hint" id="strategyDesc">Pure random — every number has equal chance</p>
+
+    <div class="card" id="savedPicksCard" style="margin-top: 20px; display: none;">
+      <div class="card-title"><span class="ic">💾</span> Your Saved Tickets</div>
+      <div id="savedPicksList"></div>
+    </div>
+  </div>
+
+  <!-- TOTO RESULTS VIEW -->
+  <div id="view-toto" class="view">
+    <h2 style="font-family: 'Black Han Sans', sans-serif; font-size: 1.6rem; margin-bottom: 4px;">TOTO Results</h2>
+    <p style="color: var(--muted); font-size: 0.85rem; margin-bottom: 18px;">Singapore Pools · Last 20 draws</p>
+
+    <div class="card" style="background: linear-gradient(135deg, rgba(74,222,128,0.08), rgba(74,222,128,0.03)); border-color: rgba(74,222,128,0.2);">
+      <div class="card-title"><span class="ic">🎯</span> Check Your Numbers</div>
+      <p style="font-size: 0.82rem; color: var(--muted); margin-bottom: 10px;">Enter your 6 numbers to check against the latest draw</p>
+      <div class="check-grid">
+        <input type="number" class="check-input" min="1" max="49" id="chk0" inputmode="numeric">
+        <input type="number" class="check-input" min="1" max="49" id="chk1" inputmode="numeric">
+        <input type="number" class="check-input" min="1" max="49" id="chk2" inputmode="numeric">
+        <input type="number" class="check-input" min="1" max="49" id="chk3" inputmode="numeric">
+        <input type="number" class="check-input" min="1" max="49" id="chk4" inputmode="numeric">
+        <input type="number" class="check-input" min="1" max="49" id="chk5" inputmode="numeric">
+        <input type="number" class="check-input bonus-input" min="1" max="49" id="chk6" inputmode="numeric" placeholder="B">
+      </div>
+      <p class="hint" style="margin-bottom: 12px;">Your 6 numbers + last circle = bonus (optional)</p>
+      <button class="btn btn-secondary" onclick="checkNumbers()" style="background: var(--surface);">CHECK MATCHES</button>
+      <div class="check-result" id="checkResult"></div>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; margin: 24px 0 12px;">
+      <h3 style="font-size: 1.1rem;">Recent Draws</h3>
+      <button class="pill" onclick="openAddDraw()" style="padding: 8px 14px; font-size: 0.78rem;">+ Add Draw</button>
+    </div>
+
+    <div id="drawsList"></div>
+
+    <div class="card">
+      <div class="card-title"><span class="ic">📊</span> Historical Analysis</div>
+      <div class="stat-grid">
+        <div class="stat-tile">
+          <div class="label">🔥 Hottest 6</div>
+          <div class="nums" id="hotNums"></div>
+        </div>
+        <div class="stat-tile">
+          <div class="label">❄️ Coldest 6</div>
+          <div class="nums" id="coldNums"></div>
+        </div>
+      </div>
+      <p class="hint" style="margin-top: 12px; line-height: 1.5;">⚠️ Lottery draws are random. Past frequency doesn't predict future results. For entertainment only!</p>
+    </div>
+  </div>
+
+  <!-- PROFILE VIEW -->
+  <div id="view-profile" class="view">
+    <h2 style="font-family: 'Black Han Sans', sans-serif; font-size: 1.6rem; margin-bottom: 4px;">Profiles</h2>
+    <p style="color: var(--muted); font-size: 0.85rem; margin-bottom: 18px;">Switch between profiles on this device</p>
+
+    <div class="profile-list" id="profileList"></div>
+
+    <button class="btn btn-secondary" onclick="openAddProfile()">
+      <span>➕</span> ADD PROFILE
+    </button>
+
+    <div class="card" style="margin-top: 24px;">
+      <div class="card-title"><span class="ic">⚙️</span> About</div>
+      <p style="font-size: 0.85rem; line-height: 1.6; color: var(--muted);">
+        Lucky Draw · Built with care 💛<br>
+        All data stored locally on your phone.<br>
+        Latest TOTO bundled: <strong style="color: var(--text);" id="latestDrawInfo">—</strong>
+      </p>
+    </div>
+
+    <div class="disclaimer">
+      🎲 For entertainment only. Lottery outcomes are random.<br>
+      Please play responsibly. <span class="my-text">တာဝန်သိ ကစားကြပါ။</span>
+    </div>
+  </div>
+</div>
+
+<!-- TAB BAR -->
+<div class="tab-bar" id="tabBar" style="display:none">
+  <button class="tab-btn active" onclick="showTab('today')"><span class="ic">🌅</span><span>Today</span></button>
+  <button class="tab-btn" onclick="showTab('generate')"><span class="ic">🎲</span><span>Generate</span></button>
+  <button class="tab-btn" onclick="showTab('toto')"><span class="ic">🎯</span><span>TOTO</span></button>
+  <button class="tab-btn" onclick="showTab('profile')"><span class="ic">👤</span><span>Profile</span></button>
+</div>
+
+<!-- MODAL -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal" id="modal">
+    <div class="modal-handle"></div>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<script>
+// =====================================================
+// TOTO HISTORICAL DATA (Singapore Pools)
+// =====================================================
+const TOTO_HISTORY = [
+  [4186, '2026-05-28', [10,13,30,35,38,44], 15],
+  [4185, '2026-05-25', [11,12,24,33,38,46], 30],
+  [4184, '2026-05-21', [11,18,25,36,39,49], 41],
+  [4183, '2026-05-18', [7,18,32,37,41,44], 19],
+  [4182, '2026-05-14', [4,8,21,25,43,46], 32],
+  [4181, '2026-05-11', [6,10,25,26,34,40], 30],
+  [4180, '2026-05-07', [2,3,8,16,20,47], 10],
+  [4179, '2026-05-04', [7,18,19,30,36,48], 11],
+  [4178, '2026-04-30', [2,6,7,31,35,39], 15],
+  [4177, '2026-04-27', [3,11,13,22,28,48], 21],
+  [4176, '2026-04-23', [3,5,15,23,37,42], 48],
+  [4175, '2026-04-20', [3,5,9,23,43,49], 8],
+  [4174, '2026-04-16', [1,3,6,12,21,41], 18],
+  [4173, '2026-04-13', [4,8,10,15,16,26], 17],
+  [4172, '2026-04-09', [1,2,6,9,44,48], 24],
+  [4171, '2026-04-06', [14,23,29,30,39,48], 12],
+  [4170, '2026-04-02', [1,7,8,23,30,33], 21],
+  [4169, '2026-03-30', [4,12,26,30,46,47], 6],
+  [4168, '2026-03-26', [4,7,22,29,33,46], 48],
+  [4167, '2026-03-23', [4,25,28,33,43,48], 31],
+];
+
+let state = {
+  profiles: [],
+  currentProfileId: null,
+  savedPicks: [],
+  customDraws: [],
+  currentStrategy: 'quick',
+  generatedNumbers: null,
+  bannerDismissed: false,
+};
+
+const STORAGE_KEY = 'luckyDrawPro_v1';
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) Object.assign(state, JSON.parse(raw));
+  } catch (e) { console.error(e); }
+}
+function saveState() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+  catch (e) { console.error(e); }
+}
+
+// =====================================================
+// ZODIAC & NUMEROLOGY
+// =====================================================
+function getWesternZodiac(month, day) {
+  const signs = [
+    { name: 'Capricorn', emoji: '♑', from: '12-22', to: '1-19' },
+    { name: 'Aquarius', emoji: '♒', from: '1-20', to: '2-18' },
+    { name: 'Pisces', emoji: '♓', from: '2-19', to: '3-20' },
+    { name: 'Aries', emoji: '♈', from: '3-21', to: '4-19' },
+    { name: 'Taurus', emoji: '♉', from: '4-20', to: '5-20' },
+    { name: 'Gemini', emoji: '♊', from: '5-21', to: '6-20' },
+    { name: 'Cancer', emoji: '♋', from: '6-21', to: '7-22' },
+    { name: 'Leo', emoji: '♌', from: '7-23', to: '8-22' },
+    { name: 'Virgo', emoji: '♍', from: '8-23', to: '9-22' },
+    { name: 'Libra', emoji: '♎', from: '9-23', to: '10-22' },
+    { name: 'Scorpio', emoji: '♏', from: '10-23', to: '11-21' },
+    { name: 'Sagittarius', emoji: '♐', from: '11-22', to: '12-21' },
+  ];
+  if ((month === 12 && day >= 22) || (month === 1 && day <= 19)) return signs[0];
+  for (const s of signs.slice(1)) {
+    const [fm, fd] = s.from.split('-').map(Number);
+    const [tm, td] = s.to.split('-').map(Number);
+    if ((month === fm && day >= fd) || (month === tm && day <= td)) return s;
+  }
+  return signs[0];
+}
+
+const CHINESE_ZODIAC = [
+  { name: 'Rat', emoji: '🐀' }, { name: 'Ox', emoji: '🐂' },
+  { name: 'Tiger', emoji: '🐅' }, { name: 'Rabbit', emoji: '🐇' },
+  { name: 'Dragon', emoji: '🐉' }, { name: 'Snake', emoji: '🐍' },
+  { name: 'Horse', emoji: '🐎' }, { name: 'Goat', emoji: '🐐' },
+  { name: 'Monkey', emoji: '🐒' }, { name: 'Rooster', emoji: '🐓' },
+  { name: 'Dog', emoji: '🐕' }, { name: 'Pig', emoji: '🐖' },
+];
+function getChineseZodiac(year) {
+  return CHINESE_ZODIAC[(year - 4) % 12];
+}
+
+function getLifePath(month, day, year) {
+  const digitSum = n => {
+    while (n > 9 && ![11,22,33].includes(n)) {
+      n = String(n).split('').reduce((a,b) => a + Number(b), 0);
+    }
+    return n;
+  };
+  return digitSum(digitSum(month) + digitSum(day) + digitSum(year));
+}
+
+const LIFE_PATH_DESC = {
+  1: 'The Leader — independent, ambitious, pioneering. You forge your own path.',
+  2: 'The Diplomat — sensitive, cooperative, intuitive. You bring harmony.',
+  3: 'The Creative — expressive, joyful, communicative. You inspire others.',
+  4: 'The Builder — practical, disciplined, hardworking. You create solid foundations.',
+  5: 'The Adventurer — free-spirited, curious, versatile. You embrace change.',
+  6: 'The Caretaker — nurturing, responsible, loving. You support those around you.',
+  7: 'The Seeker — analytical, spiritual, introspective. You uncover deeper truths.',
+  8: 'The Achiever — ambitious, powerful, business-minded. You manifest abundance.',
+  9: 'The Humanitarian — compassionate, idealistic, generous. You serve a greater purpose.',
+  11: 'The Visionary — intuitive, inspiring, spiritually aware. A master number of insight.',
+  22: 'The Master Builder — practical visionary. You can manifest big dreams.',
+  33: 'The Master Teacher — selfless guide and uplifter of others.',
+};
+
+// =====================================================
+// LUCK & LUCKY NUMBERS
+// =====================================================
+function hashCode(str) {
+  let h = 0;
+  for (let i = 0; i < str.length; i++) {
+    h = ((h << 5) - h) + str.charCodeAt(i);
+    h |= 0;
+  }
+  return Math.abs(h);
+}
+
+function getDailyLuck(profile, dateStr) {
+  const seed = `${profile.bdYear}-${profile.bdMonth}-${profile.bdDay}|${dateStr}`;
+  const hash = hashCode(seed);
+  const score = (hash % 41) + 60;
+  const messages = {
+    excellent: [
+      'Stars are aligned. Today is yours! ⭐',
+      'Big energy today. Trust your instincts!',
+      'A wonderful day to take chances.',
+      'Fortune favors you today. Make a move!',
+    ],
+    great: [
+      'Solid day ahead. Good things coming your way!',
+      'Lucky vibes flowing. Smile more today 😊',
+      'Things will line up nicely today.',
+      'A day of small wins. Keep going!',
+    ],
+    good: [
+      'Steady as you go. A balanced day.',
+      'Nothing dramatic — just keep doing you.',
+      'Average is underrated. Enjoy the calm.',
+      'Patience pays off today.',
+    ],
+  };
+  let bucket;
+  if (score >= 88) bucket = 'excellent';
+  else if (score >= 75) bucket = 'great';
+  else bucket = 'good';
+  const msg = messages[bucket][hash % messages[bucket].length];
+  return { score, msg };
+}
+
+function getLuckyNumbers(profile, dateStr) {
+  const seed = `${profile.bdYear}-${profile.bdMonth}-${profile.bdDay}|${dateStr}|lucky`;
+  let h = hashCode(seed);
+  const pool = Array.from({length: 49}, (_, i) => i + 1);
+  const nums = [];
+  for (let i = 0; i < 5; i++) {
+    const idx = h % pool.length;
+    nums.push(pool.splice(idx, 1)[0]);
+    h = Math.floor(h / 49) + hashCode(seed + i);
+  }
+  return nums.sort((a,b) => a-b);
+}
+
+// =====================================================
+// FREQUENCY
+// =====================================================
+function computeFrequency() {
+  const freq = {};
+  for (let i = 1; i <= 49; i++) freq[i] = 0;
+  const allDraws = [...TOTO_HISTORY, ...state.customDraws];
+  allDraws.forEach(d => d[2].forEach(n => freq[n]++));
+  return freq;
+}
+function getHotCold(n = 6) {
+  const freq = computeFrequency();
+  const sorted = Object.entries(freq).map(([k,v]) => [Number(k), v]);
+  sorted.sort((a,b) => b[1] - a[1]);
+  return {
+    hot: sorted.slice(0, n).map(x => x[0]).sort((a,b) => a-b),
+    cold: sorted.slice(-n).map(x => x[0]).sort((a,b) => a-b),
+  };
+}
+
+// =====================================================
+// STRATEGIES
+// =====================================================
+function pickRandom(pool, n) {
+  pool = [...pool];
+  const out = [];
+  for (let i = 0; i < n; i++) {
+    out.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
+  }
+  return out.sort((a,b) => a-b);
+}
+const STRATEGIES = {
+  quick: {
+    desc: 'Pure random — every number has equal chance',
+    run: () => pickRandom(Array.from({length:49}, (_,i)=>i+1), 6),
+  },
+  lucky: {
+    desc: 'Weighted toward your daily lucky numbers',
+    run: () => {
+      const p = currentProfile();
+      const today = new Date().toISOString().slice(0,10);
+      const lucky = getLuckyNumbers(p, today);
+      const fromLucky = pickRandom(lucky, Math.min(3, lucky.length));
+      const remaining = Array.from({length:49}, (_,i)=>i+1).filter(n => !fromLucky.includes(n));
+      const fromRandom = pickRandom(remaining, 6 - fromLucky.length);
+      return [...fromLucky, ...fromRandom].sort((a,b) => a-b);
+    },
+  },
+  hot: {
+    desc: 'From the 15 most frequently drawn numbers',
+    run: () => {
+      const freq = computeFrequency();
+      const top = Object.entries(freq).map(([k,v]) => [Number(k), v])
+        .sort((a,b) => b[1] - a[1]).slice(0, 15).map(x => x[0]);
+      return pickRandom(top, 6);
+    },
+  },
+  cold: {
+    desc: 'From the 15 least frequently drawn (could be "due"!)',
+    run: () => {
+      const freq = computeFrequency();
+      const bottom = Object.entries(freq).map(([k,v]) => [Number(k), v])
+        .sort((a,b) => a[1] - b[1]).slice(0, 15).map(x => x[0]);
+      return pickRandom(bottom, 6);
+    },
+  },
+  balanced: {
+    desc: '2 hot + 2 cold + 2 random — diversified pick',
+    run: () => {
+      const freq = computeFrequency();
+      const all = Object.entries(freq).map(([k,v]) => [Number(k), v]);
+      all.sort((a,b) => b[1] - a[1]);
+      const hot = all.slice(0, 12).map(x => x[0]);
+      const cold = all.slice(-12).map(x => x[0]);
+      const mid = all.slice(12, -12).map(x => x[0]);
+      return [
+        ...pickRandom(hot, 2),
+        ...pickRandom(cold, 2),
+        ...pickRandom(mid, 2),
+      ].sort((a,b) => a-b);
+    },
+  },
+};
+
+// =====================================================
+// HELPERS
+// =====================================================
+function currentProfile() {
+  return state.profiles.find(p => p.id === state.currentProfileId);
+}
+function colorForNum(n) {
+  const palettes = [
+    ['#e74c3c', '#c0392b'], ['#e67e22', '#d35400'],
+    ['#f39c12', '#d4ac0d'], ['#2ecc71', '#27ae60'],
+    ['#3498db', '#2980b9'], ['#9b59b6', '#8e44ad'],
+  ];
+  return palettes[(n - 1) % 6];
+}
+function avatarColor(name) {
+  const colors = ['#e74c3c','#3498db','#2ecc71','#9b59b6','#f39c12','#1abc9c'];
+  return colors[hashCode(name || 'x') % colors.length];
+}
+function formatDate(iso) {
+  const d = new Date(iso);
+  return d.toLocaleDateString('en-SG', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+// =====================================================
+// RENDER
+// =====================================================
+function renderAll() {
+  const p = currentProfile();
+  if (!p) return;
+  document.getElementById('profileAvatar').textContent = p.name[0].toUpperCase();
+  document.getElementById('profileAvatar').style.background = `linear-gradient(135deg, ${avatarColor(p.name)}, ${avatarColor(p.name)}aa)`;
+  document.getElementById('profileName').textContent = p.name;
+  renderToday();
+  renderGenerate();
+  renderTOTO();
+  renderProfile();
+}
+
+function renderToday() {
+  const p = currentProfile();
+  const today = new Date();
+  const todayStr = today.toISOString().slice(0,10);
+  document.getElementById('greetName').textContent = p.name;
+  document.getElementById('todayDate').textContent = today.toLocaleDateString('en-SG', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  const { score, msg } = getDailyLuck(p, todayStr);
+  document.getElementById('luckScore').textContent = score;
+  document.getElementById('luckMsg').innerHTML = `"${msg}"`;
+  const w = getWesternZodiac(p.bdMonth, p.bdDay);
+  document.getElementById('westZodEmoji').textContent = w.emoji;
+  document.getElementById('westZodName').textContent = w.name;
+  const c = getChineseZodiac(p.bdYear);
+  document.getElementById('chineseZodEmoji').textContent = c.emoji;
+  document.getElementById('chineseZodName').textContent = c.name;
+  const lucky = getLuckyNumbers(p, todayStr);
+  const ln = document.getElementById('luckyNumbers');
+  ln.innerHTML = '';
+  lucky.forEach(n => {
+    const el = document.createElement('div');
+    el.className = 'lucky-num';
+    el.textContent = n < 10 ? '0' + n : n;
+    ln.appendChild(el);
+  });
+  const lp = getLifePath(p.bdMonth, p.bdDay, p.bdYear);
+  document.getElementById('lifePathNum').textContent = lp;
+  document.getElementById('lifePathDesc').textContent = LIFE_PATH_DESC[lp] || 'A unique path of your own making.';
+}
+
+function renderGenerate() {
+  document.getElementById('strategyDesc').textContent = STRATEGIES[state.currentStrategy].desc;
+  const list = document.getElementById('savedPicksList');
+  const card = document.getElementById('savedPicksCard');
+  const profilePicks = state.savedPicks.filter(p => p.profileId === state.currentProfileId);
+  if (profilePicks.length === 0) { card.style.display = 'none'; return; }
+  card.style.display = 'block';
+  list.innerHTML = '';
+  profilePicks.slice().reverse().forEach(pick => {
+    const row = document.createElement('div');
+    row.className = 'saved-pick';
+    const meta = document.createElement('div');
+    meta.className = 'meta';
+    meta.innerHTML = `<span>${pick.strategy} · ${formatDate(pick.savedAt)}</span><button class="del-btn" data-id="${pick.id}">×</button>`;
+    row.appendChild(meta);
+    pick.nums.forEach(n => {
+      const c = colorForNum(n);
+      const el = document.createElement('div');
+      el.className = 'num';
+      el.style.background = `linear-gradient(135deg, ${c[0]}, ${c[1]})`;
+      el.style.color = 'white';
+      el.textContent = n < 10 ? '0' + n : n;
+      row.appendChild(el);
+    });
+    list.appendChild(row);
+  });
+  list.querySelectorAll('.del-btn').forEach(b => {
+    b.onclick = e => {
+      e.stopPropagation();
+      state.savedPicks = state.savedPicks.filter(p => p.id !== b.dataset.id);
+      saveState();
+      renderGenerate();
+    };
+  });
+}
+
+function renderTOTO() {
+  const all = [...state.customDraws, ...TOTO_HISTORY].sort((a,b) => b[0] - a[0]);
+  const list = document.getElementById('drawsList');
+  list.innerHTML = '';
+  all.slice(0, 25).forEach((draw, idx) => {
+    const [drawNo, date, nums, bonus] = draw;
+    const card = document.createElement('div');
+    card.className = 'draw-card' + (idx === 0 ? ' latest' : '');
+    const meta = document.createElement('div');
+    meta.className = 'draw-meta';
+    meta.innerHTML = `
+      <div class="date">${formatDate(date)}</div>
+      <div class="badge ${idx === 0 ? 'latest-badge' : ''}">${idx === 0 ? '✨ LATEST' : '#' + drawNo}</div>
+    `;
+    card.appendChild(meta);
+    const balls = document.createElement('div');
+    balls.className = 'draw-balls';
+    nums.forEach(n => {
+      const el = document.createElement('div');
+      el.className = 'draw-num';
+      el.textContent = n < 10 ? '0' + n : n;
+      balls.appendChild(el);
+    });
+    const plus = document.createElement('span');
+    plus.className = 'plus-sign';
+    plus.textContent = '+';
+    balls.appendChild(plus);
+    const b = document.createElement('div');
+    b.className = 'draw-num bonus';
+    b.textContent = bonus < 10 ? '0' + bonus : bonus;
+    balls.appendChild(b);
+    const lbl = document.createElement('span');
+    lbl.className = 'bonus-label';
+    lbl.textContent = 'BONUS';
+    balls.appendChild(lbl);
+    card.appendChild(balls);
+    list.appendChild(card);
+  });
+  const { hot, cold } = getHotCold(6);
+  const hotEl = document.getElementById('hotNums');
+  const coldEl = document.getElementById('coldNums');
+  hotEl.innerHTML = ''; coldEl.innerHTML = '';
+  hot.forEach(n => { const el = document.createElement('div'); el.className = 'n hot'; el.textContent = n < 10 ? '0' + n : n; hotEl.appendChild(el); });
+  cold.forEach(n => { const el = document.createElement('div'); el.className = 'n cold'; el.textContent = n < 10 ? '0' + n : n; coldEl.appendChild(el); });
+  document.getElementById('latestDrawInfo').textContent = formatDate(all[0][1]);
+}
+
+function renderProfile() {
+  const list = document.getElementById('profileList');
+  list.innerHTML = '';
+  state.profiles.forEach(p => {
+    const row = document.createElement('div');
+    row.className = 'profile-row' + (p.id === state.currentProfileId ? ' current' : '');
+    row.innerHTML = `
+      <div class="avatar" style="background: linear-gradient(135deg, ${avatarColor(p.name)}, ${avatarColor(p.name)}aa); color: white;">${p.name[0].toUpperCase()}</div>
+      <div class="info">
+        <div class="nm">${p.name}</div>
+        <div class="bd">${p.bdDay}/${p.bdMonth}/${p.bdYear} · ${getWesternZodiac(p.bdMonth, p.bdDay).name} · ${getChineseZodiac(p.bdYear).name}</div>
+      </div>
+      ${p.id === state.currentProfileId ? '<span class="current-badge">ACTIVE</span>' : '<button class="del-btn" data-del="' + p.id + '">×</button>'}
+    `;
+    row.onclick = (e) => {
+      if (e.target.matches('.del-btn')) return;
+      state.currentProfileId = p.id;
+      saveState();
+      renderAll();
+    };
+    list.appendChild(row);
+  });
+  list.querySelectorAll('[data-del]').forEach(b => {
+    b.onclick = e => {
+      e.stopPropagation();
+      if (confirm('Delete this profile?')) {
+        state.profiles = state.profiles.filter(p => p.id !== b.dataset.del);
+        state.savedPicks = state.savedPicks.filter(p => p.profileId !== b.dataset.del);
+        saveState();
+        renderAll();
+      }
+    };
+  });
+}
+
+// =====================================================
+// GENERATE
+// =====================================================
+let isAnimating = false;
+function generate() {
+  if (isAnimating) return;
+  isAnimating = true;
+  const nums = STRATEGIES[state.currentStrategy].run();
+  state.generatedNumbers = nums;
+  document.getElementById('placeholder').style.display = 'none';
+  const display = document.getElementById('ballsDisplay');
+  display.innerHTML = '';
+  const grid = document.createElement('div');
+  grid.className = 'balls-grid';
+  display.appendChild(grid);
+  nums.forEach((n, i) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'ball-wrap';
+    const c = colorForNum(n);
+    const ball = document.createElement('div');
+    ball.className = 'ball';
+    ball.textContent = n < 10 ? '0' + n : n;
+    ball.style.background = `linear-gradient(135deg, ${c[0]}, ${c[1]})`;
+    const lbl = document.createElement('div');
+    lbl.className = 'ball-label';
+    lbl.textContent = `#${i + 1}`;
+    wrap.appendChild(ball);
+    wrap.appendChild(lbl);
+    grid.appendChild(wrap);
+    setTimeout(() => wrap.classList.add('show'), i * 110);
+  });
+  setTimeout(() => isAnimating = false, nums.length * 110 + 400);
+}
+
+function saveCurrent() {
+  if (!state.generatedNumbers) { alert('Generate some numbers first!'); return; }
+  state.savedPicks.push({
+    id: 'pick_' + Date.now(),
+    profileId: state.currentProfileId,
+    nums: state.generatedNumbers,
+    strategy: state.currentStrategy,
+    savedAt: new Date().toISOString(),
+  });
+  saveState();
+  renderGenerate();
+  const btn = document.getElementById('saveBtn');
+  const orig = btn.innerHTML;
+  btn.innerHTML = '✓';
+  setTimeout(() => btn.innerHTML = orig, 800);
+}
+
+// =====================================================
+// CHECK
+// =====================================================
+function checkNumbers() {
+  const inputs = [];
+  for (let i = 0; i < 6; i++) {
+    const v = parseInt(document.getElementById('chk' + i).value);
+    if (isNaN(v) || v < 1 || v > 49) { alert('Please enter 6 valid numbers (1-49)'); return; }
+    inputs.push(v);
+  }
+  if (new Set(inputs).size !== 6) { alert('Numbers must be unique'); return; }
+  const bonusGuess = parseInt(document.getElementById('chk6').value);
+  const all = [...state.customDraws, ...TOTO_HISTORY].sort((a,b) => b[0] - a[0]);
+  const [drawNo, date, winning, bonus] = all[0];
+  const matches = inputs.filter(n => winning.includes(n));
+  const bonusMatch = !isNaN(bonusGuess) && bonusGuess === bonus;
+  const res = document.getElementById('checkResult');
+  res.classList.add('show');
+  res.classList.toggle('miss', matches.length < 3);
+  let prize = '';
+  const m = matches.length;
+  const b = bonusMatch ? 1 : 0;
+  if (m === 6) prize = '🎉 GROUP 1 — JACKPOT!! 🎉';
+  else if (m === 5 && b) prize = '🥈 Group 2 prize!';
+  else if (m === 5) prize = '🥉 Group 3 prize!';
+  else if (m === 4 && b) prize = '🎊 Group 4 prize!';
+  else if (m === 4) prize = '💰 Group 5 prize ($50)';
+  else if (m === 3 && b) prize = '💰 Group 6 prize ($25)';
+  else if (m === 3) prize = '💵 Group 7 prize ($10)';
+  else prize = 'No prize this time — try again! 🍀';
+  res.innerHTML = `
+    <div class="big-num">${m}/6</div>
+    <div class="msg">${prize}</div>
+    <div style="font-size: 0.78rem; color: var(--muted); margin-top: 8px;">
+      Checked against ${formatDate(date)} (Draw #${drawNo})
+      ${bonusMatch ? '<br>✨ You matched the bonus too!' : ''}
+    </div>
+  `;
+}
+
+// =====================================================
+// MODALS
+// =====================================================
+function openAddDraw() {
+  const html = `
+    <h3>Add Latest Draw</h3>
+    <p style="font-size: 0.85rem; color: var(--muted); margin-bottom: 16px;">Enter latest TOTO numbers from Singapore Pools.</p>
+    <div class="form-group">
+      <label>Draw Date</label>
+      <input type="date" id="addDrawDate">
+    </div>
+    <div class="form-group">
+      <label>Draw Number (optional)</label>
+      <input type="number" id="addDrawNo" placeholder="e.g. 4187">
+    </div>
+    <div class="form-group">
+      <label>6 Winning Numbers + Bonus</label>
+      <div class="check-grid">
+        <input type="number" class="check-input" id="addN0" min="1" max="49">
+        <input type="number" class="check-input" id="addN1" min="1" max="49">
+        <input type="number" class="check-input" id="addN2" min="1" max="49">
+        <input type="number" class="check-input" id="addN3" min="1" max="49">
+        <input type="number" class="check-input" id="addN4" min="1" max="49">
+        <input type="number" class="check-input" id="addN5" min="1" max="49">
+        <input type="number" class="check-input bonus-input" id="addN6" min="1" max="49" placeholder="B">
+      </div>
+      <p class="hint" style="margin-top: 4px;">Last circle = bonus number</p>
+    </div>
+    <button class="btn" onclick="submitAddDraw()">SAVE DRAW</button>
+  `;
+  showModal(html);
+  setTimeout(() => document.getElementById('addDrawDate').value = new Date().toISOString().slice(0,10), 50);
+}
+
+function submitAddDraw() {
+  const date = document.getElementById('addDrawDate').value;
+  const drawNo = parseInt(document.getElementById('addDrawNo').value) || (Math.max(...[...TOTO_HISTORY, ...state.customDraws].map(d => d[0])) + 1);
+  const nums = [];
+  for (let i = 0; i < 6; i++) {
+    const v = parseInt(document.getElementById('addN' + i).value);
+    if (isNaN(v) || v < 1 || v > 49) { alert('Enter all 6 winning numbers (1-49)'); return; }
+    nums.push(v);
+  }
+  const bonus = parseInt(document.getElementById('addN6').value);
+  if (isNaN(bonus) || bonus < 1 || bonus > 49) { alert('Enter the bonus number'); return; }
+  if (new Set([...nums, bonus]).size !== 7) { alert('All 7 numbers must be unique'); return; }
+  if (!date) { alert('Pick a date'); return; }
+  nums.sort((a,b) => a-b);
+  state.customDraws.push([drawNo, date, nums, bonus]);
+  saveState();
+  closeModal();
+  renderTOTO();
+}
+
+function openAddProfile() {
+  const days = Array.from({length:31}, (_,i) => `<option value="${i+1}">${i+1}</option>`).join('');
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+    .map((m,i) => `<option value="${i+1}">${m}</option>`).join('');
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({length: 100}, (_,i) => `<option value="${currentYear - i - 18}">${currentYear - i - 18}</option>`).join('');
+  const html = `
+    <h3>Add Profile</h3>
+    <p style="font-size: 0.85rem; color: var(--muted); margin-bottom: 16px;">Add your wife, family, or friend.</p>
+    <div class="form-group"><label>Name</label><input type="text" id="newName" placeholder="e.g. Su Su" autocomplete="off"></div>
+    <div class="form-group"><label>Birth Date</label>
+      <div class="form-row">
+        <select id="newDay">${days}</select>
+        <select id="newMonth">${months}</select>
+        <select id="newYear">${years}</select>
+      </div>
+    </div>
+    <button class="btn" onclick="submitAddProfile()">ADD PROFILE</button>
+  `;
+  showModal(html);
+}
+
+function submitAddProfile() {
+  const name = document.getElementById('newName').value.trim();
+  if (!name) { alert('Please enter a name'); return; }
+  const profile = {
+    id: 'profile_' + Date.now(),
+    name,
+    bdDay: parseInt(document.getElementById('newDay').value),
+    bdMonth: parseInt(document.getElementById('newMonth').value),
+    bdYear: parseInt(document.getElementById('newYear').value),
+  };
+  state.profiles.push(profile);
+  state.currentProfileId = profile.id;
+  saveState();
+  closeModal();
+  renderAll();
+}
+
+function showModal(html) {
+  document.getElementById('modalContent').innerHTML = html;
+  document.getElementById('modalBg').classList.add('open');
+}
+function closeModal() {
+  document.getElementById('modalBg').classList.remove('open');
+}
+
+// =====================================================
+// TABS
+// =====================================================
+function showTab(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach((b, i) => {
+    const names = ['today','generate','toto','profile'];
+    b.classList.toggle('active', names[i] === name);
+  });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// =====================================================
+// SETUP
+// =====================================================
+function initSetupForm() {
+  const ds = document.getElementById('setupDay');
+  const ms = document.getElementById('setupMonth');
+  const ys = document.getElementById('setupYear');
+  for (let i = 1; i <= 31; i++) ds.innerHTML += `<option value="${i}">${i}</option>`;
+  ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'].forEach((m,i) => {
+    ms.innerHTML += `<option value="${i+1}">${m}</option>`;
+  });
+  const cy = new Date().getFullYear();
+  for (let y = cy - 18; y > cy - 100; y--) ys.innerHTML += `<option value="${y}">${y}</option>`;
+  ms.value = 1; ds.value = 15; ys.value = 1990;
+}
+
+function finishSetup() {
+  const name = document.getElementById('setupName').value.trim();
+  if (!name) { alert('Please enter your name'); return; }
+  const profile = {
+    id: 'profile_' + Date.now(),
+    name,
+    bdDay: parseInt(document.getElementById('setupDay').value),
+    bdMonth: parseInt(document.getElementById('setupMonth').value),
+    bdYear: parseInt(document.getElementById('setupYear').value),
+  };
+  state.profiles = [profile];
+  state.currentProfileId = profile.id;
+  saveState();
+  document.getElementById('setupScreen').style.display = 'none';
+  document.getElementById('mainApp').style.display = 'block';
+  document.getElementById('tabBar').style.display = 'flex';
+  renderAll();
+  maybeShowInstallBanner();
+}
+
+// =====================================================
+// INSTALL BANNER (iOS Safari)
+// =====================================================
+function isIOS() {
+  return /iPad|iPhone|iPod/.test(navigator.userAgent);
+}
+function isStandalone() {
+  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+}
+function maybeShowInstallBanner() {
+  if (state.bannerDismissed || isStandalone()) return;
+  if (isIOS()) {
+    setTimeout(() => document.getElementById('installBanner').classList.add('show'), 3000);
+  }
+}
+function dismissBanner() {
+  document.getElementById('installBanner').classList.remove('show');
+  state.bannerDismissed = true;
+  saveState();
+}
+
+// =====================================================
+// EVENTS
+// =====================================================
+document.querySelectorAll('.pill[data-strat]').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('.pill[data-strat]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    state.currentStrategy = btn.dataset.strat;
+    document.getElementById('strategyDesc').textContent = STRATEGIES[state.currentStrategy].desc;
+  };
+});
+
+document.getElementById('modalBg').onclick = e => {
+  if (e.target.id === 'modalBg') closeModal();
+};
+
+// Auto-tab
+['chk0','chk1','chk2','chk3','chk4','chk5','chk6','addN0','addN1','addN2','addN3','addN4','addN5','addN6']
+  .forEach((id, idx, arr) => {
+    document.addEventListener('input', e => {
+      if (e.target.id === id && e.target.value.length >= 2 && idx < arr.length - 1) {
+        const next = document.getElementById(arr[idx + 1]);
+        if (next) next.focus();
+      }
+    });
+  });
+
+// =====================================================
+// BOOT
+// =====================================================
+loadState();
+initSetupForm();
+if (state.profiles.length > 0 && state.currentProfileId) {
+  document.getElementById('setupScreen').style.display = 'none';
+  document.getElementById('mainApp').style.display = 'block';
+  document.getElementById('tabBar').style.display = 'flex';
+  renderAll();
+  maybeShowInstallBanner();
+}
+</script>
+</body>
+</html>
