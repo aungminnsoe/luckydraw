@@ -4,182 +4,94 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0a0a12">
-
-<!-- PWA Manifest -->
 <link rel="manifest" href="manifest.json">
-
-<!-- iOS Add-to-Home-Screen support -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Lucky Draw">
 <link rel="apple-touch-icon" href="icon.svg">
 <link rel="icon" type="image/svg+xml" href="icon.svg">
-
 <title>Lucky Draw 🎱</title>
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+Myanmar:wght@400;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0a0a12;
-    --bg2: #12121e;
-    --gold: #ffd700;
-    --gold2: #ffb300;
-    --gold-dark: #b8860b;
-    --surface: rgba(255,255,255,0.05);
-    --surface2: rgba(255,255,255,0.08);
+    --bg: #0a0a12; --bg2: #12121e;
+    --gold: #ffd700; --gold2: #ffb300; --gold-dark: #b8860b;
+    --surface: rgba(255,255,255,0.05); --surface2: rgba(255,255,255,0.08);
     --border: rgba(255,255,255,0.1);
-    --text: #f0f0fa;
-    --muted: #7a7a90;
-    --dim: #4a4a60;
-    --red: #ff5e57;
-    --green: #4ade80;
-    --blue: #60a5fa;
-    --purple: #c084fc;
+    --text: #f0f0fa; --muted: #7a7a90; --dim: #4a4a60;
+    --red: #ff5e57; --green: #4ade80; --blue: #60a5fa; --purple: #c084fc;
   }
-
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; }
   *:not(input):not(textarea) { user-select: none; }
-
   html, body { height: 100%; overflow-x: hidden; }
-
   body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    position: relative;
+    font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text);
+    min-height: 100vh; position: relative;
     padding-bottom: calc(90px + env(safe-area-inset-bottom));
     padding-top: env(safe-area-inset-top);
   }
   body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
+    content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
     background:
       radial-gradient(circle at 20% 0%, rgba(255,180,0,0.08), transparent 50%),
       radial-gradient(circle at 80% 100%, rgba(120,80,255,0.08), transparent 50%);
-    pointer-events: none;
-    z-index: 0;
   }
-
   .app { position: relative; z-index: 1; max-width: 480px; margin: 0 auto; padding: 20px 18px 0; }
-
-  /* ============ HEADER ============ */
   .top-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
   .logo { font-family: 'Black Han Sans', sans-serif; font-size: 1.3rem; color: var(--gold); letter-spacing: 1px; }
   .logo .dot { color: var(--text); }
-  .profile-chip {
-    background: var(--surface); border: 1px solid var(--border); border-radius: 999px;
-    padding: 8px 14px 8px 8px; display: flex; align-items: center; gap: 8px;
-    cursor: pointer; font-size: 0.85rem; font-weight: 600;
-  }
-  .avatar {
-    width: 28px; height: 28px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 800; font-size: 0.85rem; color: #0a0a12;
-  }
-
-  /* ============ TAB CONTENT ============ */
+  .profile-chip { background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 8px 14px 8px 8px; display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.85rem; font-weight: 600; }
+  .avatar { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.85rem; color: #0a0a12; }
   .view { display: none; animation: fadeIn 0.3s ease; }
   .view.active { display: block; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-
-  /* ============ CARDS ============ */
   .card { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 20px; margin-bottom: 16px; }
-  .card-title {
-    font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1.5px;
-    color: var(--muted); margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
-  }
+  .card-title { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
   .card-title .ic { font-size: 1rem; }
-
-  /* ============ TODAY VIEW ============ */
   .greeting { margin-bottom: 24px; }
   .greeting .hi { font-size: 0.9rem; color: var(--muted); }
   .greeting .name { font-family: 'Black Han Sans', sans-serif; font-size: 2rem; line-height: 1.1; color: var(--text); }
   .greeting .date { font-size: 0.85rem; color: var(--muted); margin-top: 4px; }
-
-  .luck-score-card {
-    background: linear-gradient(135deg, rgba(255,180,0,0.12), rgba(255,90,180,0.08));
-    border: 1px solid rgba(255,180,0,0.25);
-    text-align: center; padding: 28px 20px;
-  }
-  .luck-score {
-    font-family: 'Black Han Sans', sans-serif; font-size: 4.5rem;
-    background: linear-gradient(135deg, var(--gold2), var(--gold));
-    -webkit-background-clip: text; background-clip: text;
-    -webkit-text-fill-color: transparent; line-height: 1;
-  }
+  .luck-score-card { background: linear-gradient(135deg, rgba(255,180,0,0.12), rgba(255,90,180,0.08)); border: 1px solid rgba(255,180,0,0.25); text-align: center; padding: 28px 20px; }
+  .luck-score { font-family: 'Black Han Sans', sans-serif; font-size: 4.5rem; background: linear-gradient(135deg, var(--gold2), var(--gold)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; line-height: 1; }
+  .luck-bar { height: 6px; background: rgba(255,255,255,0.1); border-radius: 999px; margin: 14px auto 8px; max-width: 220px; overflow: hidden; }
+  .luck-bar-fill { height: 100%; background: linear-gradient(90deg, var(--gold-dark), var(--gold)); border-radius: 999px; transition: width 0.6s ease; }
+  .luck-tier { font-size: 0.72rem; letter-spacing: 2px; color: var(--gold); text-transform: uppercase; font-weight: 700; }
   .luck-score-label { font-size: 0.7rem; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-top: 8px; }
   .luck-msg { font-size: 0.95rem; color: var(--text); margin-top: 14px; font-style: italic; }
-
   .zodiac-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .zodiac-tile { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; text-align: center; }
   .zodiac-tile .emoji { font-size: 2rem; display: block; margin-bottom: 6px; }
   .zodiac-tile .name { font-weight: 700; font-size: 0.95rem; }
   .zodiac-tile .sub { font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
-
   .lucky-numbers { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 8px; }
-  .lucky-num {
-    width: 50px; height: 50px; border-radius: 50%;
-    background: linear-gradient(135deg, var(--gold2), var(--gold));
-    color: #0a0a12; display: flex; align-items: center; justify-content: center;
-    font-family: 'Black Han Sans', sans-serif; font-size: 1.1rem;
-    box-shadow: 0 4px 12px rgba(255,180,0,0.3);
-  }
-
-  /* ============ GENERATE VIEW ============ */
+  .lucky-num { width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, var(--gold2), var(--gold)); color: #0a0a12; display: flex; align-items: center; justify-content: center; font-family: 'Black Han Sans', sans-serif; font-size: 1.1rem; box-shadow: 0 4px 12px rgba(255,180,0,0.3); }
   .strategy-pills { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin: 0 -18px 16px; padding-left: 18px; padding-right: 18px; scrollbar-width: none; }
   .strategy-pills::-webkit-scrollbar { display: none; }
-  .pill {
-    flex-shrink: 0; background: var(--surface); border: 1px solid var(--border);
-    border-radius: 999px; padding: 10px 16px; font-size: 0.82rem;
-    font-weight: 600; cursor: pointer; color: var(--muted);
-    transition: all 0.2s; white-space: nowrap; font-family: inherit;
-  }
-  .pill.active {
-    background: linear-gradient(135deg, var(--gold2), var(--gold));
-    color: #0a0a12; border-color: transparent;
-    box-shadow: 0 3px 12px rgba(255,180,0,0.3);
-  }
-
+  .pill { flex-shrink: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 10px 16px; font-size: 0.82rem; font-weight: 600; cursor: pointer; color: var(--muted); transition: all 0.2s; white-space: nowrap; font-family: inherit; }
+  .pill.active { background: linear-gradient(135deg, var(--gold2), var(--gold)); color: #0a0a12; border-color: transparent; box-shadow: 0 3px 12px rgba(255,180,0,0.3); }
   .balls-display { min-height: 220px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; }
   .balls-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; width: 100%; }
   .ball-wrap { display: flex; flex-direction: column; align-items: center; gap: 6px; opacity: 0; transform: translateY(20px) scale(0.7); transition: opacity 0.4s, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
   .ball-wrap.show { opacity: 1; transform: translateY(0) scale(1); }
-  .ball {
-    width: 72px; height: 72px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Black Han Sans', sans-serif; font-size: 1.5rem; color: white;
-    position: relative;
-    box-shadow: 0 6px 16px rgba(0,0,0,0.4), inset 0 -4px 8px rgba(0,0,0,0.2), inset 0 4px 8px rgba(255,255,255,0.2);
-  }
+  .ball { width: 72px; height: 72px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Black Han Sans', sans-serif; font-size: 1.5rem; color: white; position: relative; box-shadow: 0 6px 16px rgba(0,0,0,0.4), inset 0 -4px 8px rgba(0,0,0,0.2), inset 0 4px 8px rgba(255,255,255,0.2); }
   .ball::after { content: ''; position: absolute; top: 14%; left: 22%; width: 28%; height: 18%; background: rgba(255,255,255,0.35); border-radius: 50%; filter: blur(3px); }
   .ball-label { font-size: 0.62rem; color: var(--muted); letter-spacing: 1px; }
   .placeholder { text-align: center; color: var(--muted); font-size: 0.9rem; line-height: 1.7; }
   .placeholder .big { font-size: 2.5rem; display: block; margin-bottom: 8px; }
-
-  .btn {
-    width: 100%; background: linear-gradient(135deg, var(--gold2), var(--gold));
-    color: #0a0a12; border: none; border-radius: 16px; padding: 18px;
-    font-family: 'Black Han Sans', sans-serif; font-size: 1.05rem; letter-spacing: 2px;
-    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
-    box-shadow: 0 6px 24px rgba(255,180,0,0.3); transition: transform 0.12s;
-  }
+  .btn { width: 100%; background: linear-gradient(135deg, var(--gold2), var(--gold)); color: #0a0a12; border: none; border-radius: 16px; padding: 18px; font-family: 'Black Han Sans', sans-serif; font-size: 1.05rem; letter-spacing: 2px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 6px 24px rgba(255,180,0,0.3); transition: transform 0.12s; }
   .btn:active { transform: scale(0.97); }
   .btn-secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border); box-shadow: none; }
   .btn-row { display: flex; gap: 10px; }
   .btn-row .btn { flex: 1; }
-
   .hint { font-size: 0.72rem; color: var(--muted); text-align: center; margin-top: 12px; letter-spacing: 0.3px; }
-
+  .tap-hint { font-size: 0.78rem; color: var(--gold); text-align: center; margin: 0 0 16px; font-weight: 600; letter-spacing: 0.3px; }
   .saved-pick { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px; margin-bottom: 8px; }
   .saved-pick .meta { font-size: 0.7rem; color: var(--muted); width: 100%; margin-bottom: 4px; display: flex; justify-content: space-between; }
   .saved-pick .num { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; }
   .del-btn { background: none; border: none; color: var(--muted); font-size: 1rem; cursor: pointer; padding: 2px 4px; }
-
-  /* ============ TOTO RESULTS VIEW ============ */
   .draw-card { background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02)); border: 1px solid var(--border); border-radius: 18px; padding: 18px; margin-bottom: 12px; }
   .draw-card.latest { background: linear-gradient(135deg, rgba(255,180,0,0.08), rgba(255,90,180,0.04)); border-color: rgba(255,180,0,0.3); }
   .draw-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
@@ -191,7 +103,6 @@
   .draw-num.bonus { background: linear-gradient(135deg, var(--gold2), var(--gold)); color: #0a0a12; border: none; }
   .plus-sign { color: var(--muted); font-size: 1rem; margin: 0 4px; }
   .bonus-label { font-size: 0.65rem; color: var(--muted); letter-spacing: 0.5px; margin-left: 4px; }
-
   .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
   .stat-tile { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px; }
   .stat-tile .label { font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
@@ -199,29 +110,16 @@
   .stat-tile .nums .n { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; }
   .stat-tile .n.hot { background: rgba(255,94,87,0.15); color: var(--red); border: 1px solid rgba(255,94,87,0.3); }
   .stat-tile .n.cold { background: rgba(96,165,250,0.15); color: var(--blue); border: 1px solid rgba(96,165,250,0.3); }
-
-  /* ============ CHECK NUMBERS ============ */
   .check-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin: 12px 0; }
-  .check-input {
-    aspect-ratio: 1; background: var(--surface); border: 1.5px solid var(--border);
-    border-radius: 50%; text-align: center; font-family: 'Black Han Sans', sans-serif;
-    font-size: 1rem; color: var(--text); -moz-appearance: textfield; -webkit-appearance: none;
-  }
+  .check-input { aspect-ratio: 1; background: var(--surface); border: 1.5px solid var(--border); border-radius: 50%; text-align: center; font-family: 'Black Han Sans', sans-serif; font-size: 1rem; color: var(--text); -moz-appearance: textfield; -webkit-appearance: none; }
   .check-input::-webkit-outer-spin-button, .check-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
   .check-input:focus { border-color: var(--gold); outline: none; }
   .check-input.bonus-input { border-color: rgba(255,180,0,0.4); }
-
-  .check-result {
-    background: linear-gradient(135deg, rgba(74,222,128,0.1), rgba(74,222,128,0.05));
-    border: 1px solid rgba(74,222,128,0.3); border-radius: 14px; padding: 16px; margin-top: 12px;
-    text-align: center; display: none;
-  }
+  .check-result { background: linear-gradient(135deg, rgba(74,222,128,0.1), rgba(74,222,128,0.05)); border: 1px solid rgba(74,222,128,0.3); border-radius: 14px; padding: 16px; margin-top: 12px; text-align: center; display: none; }
   .check-result.show { display: block; }
   .check-result.miss { background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02)); border-color: var(--border); }
   .check-result .big-num { font-family: 'Black Han Sans', sans-serif; font-size: 2.5rem; color: var(--gold); }
   .check-result .msg { font-size: 0.9rem; color: var(--text); margin-top: 4px; }
-
-  /* ============ PROFILE VIEW ============ */
   .profile-list { margin-bottom: 16px; }
   .profile-row { display: flex; align-items: center; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 12px; margin-bottom: 8px; cursor: pointer; }
   .profile-row.current { border-color: rgba(255,180,0,0.4); background: linear-gradient(135deg, rgba(255,180,0,0.08), transparent); }
@@ -230,75 +128,30 @@
   .profile-row .info .nm { font-weight: 700; }
   .profile-row .info .bd { font-size: 0.78rem; color: var(--muted); }
   .profile-row .current-badge { background: var(--gold); color: #0a0a12; font-size: 0.65rem; padding: 3px 8px; border-radius: 999px; font-weight: 700; letter-spacing: 0.5px; }
-
   .form-group { margin-bottom: 14px; }
   .form-group label { display: block; font-size: 0.78rem; color: var(--muted); margin-bottom: 6px; letter-spacing: 0.5px; }
-  .form-group input, .form-group select {
-    width: 100%; background: var(--surface); border: 1px solid var(--border);
-    border-radius: 12px; padding: 14px; color: var(--text); font-size: 0.95rem; font-family: inherit;
-  }
+  .form-group input, .form-group select { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px; color: var(--text); font-size: 0.95rem; font-family: inherit; }
   .form-group input:focus, .form-group select:focus { border-color: var(--gold); outline: none; }
   .form-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
-
-  /* ============ TAB BAR ============ */
-  .tab-bar {
-    position: fixed; bottom: 0; left: 0; right: 0;
-    background: rgba(10,10,18,0.92);
-    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-    border-top: 1px solid var(--border);
-    display: flex; justify-content: space-around;
-    padding: 10px 0 calc(10px + env(safe-area-inset-bottom));
-    z-index: 100;
-  }
-  .tab-btn {
-    background: none; border: none; color: var(--muted);
-    display: flex; flex-direction: column; align-items: center; gap: 4px;
-    padding: 6px 12px; font-size: 0.68rem; font-family: inherit; font-weight: 600;
-    cursor: pointer; transition: color 0.2s; letter-spacing: 0.3px;
-  }
+  .tab-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10,10,18,0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 10px 0 calc(10px + env(safe-area-inset-bottom)); z-index: 100; }
+  .tab-btn { background: none; border: none; color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px 12px; font-size: 0.68rem; font-family: inherit; font-weight: 600; cursor: pointer; transition: color 0.2s; letter-spacing: 0.3px; }
   .tab-btn .ic { font-size: 1.4rem; }
   .tab-btn.active { color: var(--gold); }
   .tab-btn.active .ic { transform: scale(1.1); }
-
-  /* ============ MODAL ============ */
-  .modal-bg {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.7);
-    backdrop-filter: blur(8px); z-index: 200; display: none;
-    align-items: flex-end; justify-content: center;
-  }
+  .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 200; display: none; align-items: flex-end; justify-content: center; }
   .modal-bg.open { display: flex; }
-  .modal {
-    background: var(--bg2); border-radius: 22px 22px 0 0; border-top: 1px solid var(--border);
-    width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto;
-    padding: 24px 20px calc(32px + env(safe-area-inset-bottom));
-    animation: slideUp 0.3s ease;
-  }
+  .modal { background: var(--bg2); border-radius: 22px 22px 0 0; border-top: 1px solid var(--border); width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; padding: 24px 20px calc(32px + env(safe-area-inset-bottom)); animation: slideUp 0.3s ease; }
   @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
   .modal-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 18px; }
   .modal h3 { font-family: 'Black Han Sans', sans-serif; font-size: 1.3rem; margin-bottom: 16px; }
-
-  /* ============ SETUP ============ */
-  .setup {
-    min-height: 90vh; display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    text-align: center; padding: 20px;
-  }
+  .setup { min-height: 90vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
   .setup .big-emoji { font-size: 4rem; margin-bottom: 16px; }
   .setup h2 { font-family: 'Black Han Sans', sans-serif; font-size: 1.8rem; color: var(--gold); margin-bottom: 8px; }
   .setup p { color: var(--muted); margin-bottom: 24px; line-height: 1.5; }
   .setup .form-container { width: 100%; max-width: 360px; }
-
   .disclaimer { font-size: 0.7rem; color: var(--dim); text-align: center; padding: 16px; line-height: 1.5; }
   .my-text { font-family: 'Noto Sans Myanmar', sans-serif; }
-
-  /* Install prompt banner */
-  .install-banner {
-    position: fixed; top: env(safe-area-inset-top); left: 0; right: 0;
-    background: linear-gradient(135deg, rgba(255,180,0,0.95), rgba(255,210,0,0.95));
-    color: #0a0a12; padding: 12px 16px; display: none;
-    align-items: center; gap: 10px; z-index: 150;
-    font-size: 0.85rem; font-weight: 600;
-  }
+  .install-banner { position: fixed; top: env(safe-area-inset-top); left: 0; right: 0; background: linear-gradient(135deg, rgba(255,180,0,0.95), rgba(255,210,0,0.95)); color: #0a0a12; padding: 12px 16px; display: none; align-items: center; gap: 10px; z-index: 150; font-size: 0.85rem; font-weight: 600; }
   .install-banner.show { display: flex; }
   .install-banner button { background: rgba(10,10,18,0.15); border: none; color: #0a0a12; padding: 6px 12px; border-radius: 8px; font-weight: 700; cursor: pointer; font-family: inherit; }
   .install-banner .close-x { margin-left: auto; background: none; padding: 4px 8px; }
@@ -306,14 +159,12 @@
 </head>
 <body>
 
-<!-- Install banner (iOS) -->
 <div class="install-banner" id="installBanner">
   <span>📲</span>
   <span>Tap Share → "Add to Home Screen" to install</span>
   <button class="close-x" onclick="dismissBanner()">×</button>
 </div>
 
-<!-- SETUP SCREEN -->
 <div id="setupScreen" class="setup">
   <div class="big-emoji">🎱</div>
   <h2>LUCKY DRAW</h2>
@@ -337,7 +188,6 @@
   </div>
 </div>
 
-<!-- MAIN APP -->
 <div id="mainApp" class="app" style="display:none">
   <div class="top-bar">
     <div class="logo">LUCKY<span class="dot">·</span>DRAW</div>
@@ -347,7 +197,6 @@
     </div>
   </div>
 
-  <!-- TODAY VIEW -->
   <div id="view-today" class="view active">
     <div class="greeting">
       <div class="hi">Mingalaba 🙏</div>
@@ -357,7 +206,9 @@
 
     <div class="card luck-score-card">
       <div class="luck-score" id="luckScore">--</div>
-      <div class="luck-score-label">Today's Luck Score</div>
+      <div class="luck-bar"><div class="luck-bar-fill" id="luckBar" style="width: 0%"></div></div>
+      <div class="luck-tier" id="luckTier">—</div>
+      <div class="luck-score-label">Today's Luck Score · out of 100</div>
       <div class="luck-msg" id="luckMsg">—</div>
     </div>
 
@@ -389,10 +240,9 @@
     </div>
   </div>
 
-  <!-- GENERATE VIEW -->
   <div id="view-generate" class="view">
     <h2 style="font-family: 'Black Han Sans', sans-serif; font-size: 1.6rem; margin-bottom: 4px;">Generate Numbers</h2>
-    <p style="color: var(--muted); font-size: 0.85rem; margin-bottom: 18px;">Pick a strategy and tap generate</p>
+    <p style="color: var(--muted); font-size: 0.85rem; margin-bottom: 18px;">Tap any strategy below to instantly generate</p>
 
     <div class="strategy-pills" id="strategyPills">
       <button class="pill active" data-strat="quick">🎲 Quick Pick</button>
@@ -402,20 +252,22 @@
       <button class="pill" data-strat="balanced">⚖️ Balanced</button>
     </div>
 
+    <p class="tap-hint" id="strategyDesc">👆 Tap any strategy above to generate</p>
+
     <div class="balls-display" id="ballsDisplay">
       <div class="placeholder" id="placeholder">
         <span class="big">🎰</span>
-        Tap generate to pick<br>your 6 lucky numbers
+        Tap a strategy above to<br>generate your 6 lucky numbers
       </div>
     </div>
 
     <div class="btn-row">
       <button class="btn" onclick="generate()">
-        <span id="btnIcon">🎲</span> GENERATE
+        <span id="btnIcon">🎲</span> ROLL AGAIN
       </button>
       <button class="btn btn-secondary" onclick="saveCurrent()" id="saveBtn" style="flex: 0 0 56px; padding: 18px 0;">💾</button>
     </div>
-    <p class="hint" id="strategyDesc">Pure random — every number has equal chance</p>
+    <p class="hint">Tap 🎲 for new numbers with the same strategy · 💾 to save</p>
 
     <div class="card" id="savedPicksCard" style="margin-top: 20px; display: none;">
       <div class="card-title"><span class="ic">💾</span> Your Saved Tickets</div>
@@ -423,7 +275,6 @@
     </div>
   </div>
 
-  <!-- TOTO RESULTS VIEW -->
   <div id="view-toto" class="view">
     <h2 style="font-family: 'Black Han Sans', sans-serif; font-size: 1.6rem; margin-bottom: 4px;">TOTO Results</h2>
     <p style="color: var(--muted); font-size: 0.85rem; margin-bottom: 18px;">Singapore Pools · Last 20 draws</p>
@@ -468,7 +319,6 @@
     </div>
   </div>
 
-  <!-- PROFILE VIEW -->
   <div id="view-profile" class="view">
     <h2 style="font-family: 'Black Han Sans', sans-serif; font-size: 1.6rem; margin-bottom: 4px;">Profiles</h2>
     <p style="color: var(--muted); font-size: 0.85rem; margin-bottom: 18px;">Switch between profiles on this device</p>
@@ -480,6 +330,16 @@
     </button>
 
     <div class="card" style="margin-top: 24px;">
+      <div class="card-title"><span class="ic">💡</span> What is Luck Score?</div>
+      <p style="font-size: 0.85rem; line-height: 1.6; color: var(--muted);">
+        A fun daily score from <strong style="color: var(--text);">60–100</strong> based on your birth date + today's date. Just for fun, not a real prediction!<br><br>
+        <span style="color: var(--gold);">88–100 = Excellent ⭐</span><br>
+        <span style="color: var(--text);">75–87 = Great 😊</span><br>
+        <span style="color: var(--muted);">60–74 = Good 🍀</span>
+      </p>
+    </div>
+
+    <div class="card">
       <div class="card-title"><span class="ic">⚙️</span> About</div>
       <p style="font-size: 0.85rem; line-height: 1.6; color: var(--muted);">
         Lucky Draw · Built with care 💛<br>
@@ -495,7 +355,6 @@
   </div>
 </div>
 
-<!-- TAB BAR -->
 <div class="tab-bar" id="tabBar" style="display:none">
   <button class="tab-btn active" onclick="showTab('today')"><span class="ic">🌅</span><span>Today</span></button>
   <button class="tab-btn" onclick="showTab('generate')"><span class="ic">🎲</span><span>Generate</span></button>
@@ -503,7 +362,6 @@
   <button class="tab-btn" onclick="showTab('profile')"><span class="ic">👤</span><span>Profile</span></button>
 </div>
 
-<!-- MODAL -->
 <div class="modal-bg" id="modalBg">
   <div class="modal" id="modal">
     <div class="modal-handle"></div>
@@ -512,9 +370,6 @@
 </div>
 
 <script>
-// =====================================================
-// TOTO HISTORICAL DATA (Singapore Pools)
-// =====================================================
 const TOTO_HISTORY = [
   [4186, '2026-05-28', [10,13,30,35,38,44], 15],
   [4185, '2026-05-25', [11,12,24,33,38,46], 30],
@@ -539,31 +394,22 @@ const TOTO_HISTORY = [
 ];
 
 let state = {
-  profiles: [],
-  currentProfileId: null,
-  savedPicks: [],
-  customDraws: [],
-  currentStrategy: 'quick',
-  generatedNumbers: null,
+  profiles: [], currentProfileId: null,
+  savedPicks: [], customDraws: [],
+  currentStrategy: 'quick', generatedNumbers: null,
   bannerDismissed: false,
 };
-
 const STORAGE_KEY = 'luckyDrawPro_v1';
 
 function loadState() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) Object.assign(state, JSON.parse(raw));
-  } catch (e) { console.error(e); }
+  try { const raw = localStorage.getItem(STORAGE_KEY); if (raw) Object.assign(state, JSON.parse(raw)); }
+  catch (e) { console.error(e); }
 }
 function saveState() {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
   catch (e) { console.error(e); }
 }
 
-// =====================================================
-// ZODIAC & NUMEROLOGY
-// =====================================================
 function getWesternZodiac(month, day) {
   const signs = [
     { name: 'Capricorn', emoji: '♑', from: '12-22', to: '1-19' },
@@ -596,9 +442,7 @@ const CHINESE_ZODIAC = [
   { name: 'Monkey', emoji: '🐒' }, { name: 'Rooster', emoji: '🐓' },
   { name: 'Dog', emoji: '🐕' }, { name: 'Pig', emoji: '🐖' },
 ];
-function getChineseZodiac(year) {
-  return CHINESE_ZODIAC[(year - 4) % 12];
-}
+function getChineseZodiac(year) { return CHINESE_ZODIAC[(year - 4) % 12]; }
 
 function getLifePath(month, day, year) {
   const digitSum = n => {
@@ -625,15 +469,9 @@ const LIFE_PATH_DESC = {
   33: 'The Master Teacher — selfless guide and uplifter of others.',
 };
 
-// =====================================================
-// LUCK & LUCKY NUMBERS
-// =====================================================
 function hashCode(str) {
   let h = 0;
-  for (let i = 0; i < str.length; i++) {
-    h = ((h << 5) - h) + str.charCodeAt(i);
-    h |= 0;
-  }
+  for (let i = 0; i < str.length; i++) { h = ((h << 5) - h) + str.charCodeAt(i); h |= 0; }
   return Math.abs(h);
 }
 
@@ -661,12 +499,12 @@ function getDailyLuck(profile, dateStr) {
       'Patience pays off today.',
     ],
   };
-  let bucket;
-  if (score >= 88) bucket = 'excellent';
-  else if (score >= 75) bucket = 'great';
-  else bucket = 'good';
+  let bucket, tier;
+  if (score >= 88) { bucket = 'excellent'; tier = 'EXCELLENT ⭐'; }
+  else if (score >= 75) { bucket = 'great'; tier = 'GREAT 😊'; }
+  else { bucket = 'good'; tier = 'GOOD 🍀'; }
   const msg = messages[bucket][hash % messages[bucket].length];
-  return { score, msg };
+  return { score, msg, tier };
 }
 
 function getLuckyNumbers(profile, dateStr) {
@@ -682,9 +520,6 @@ function getLuckyNumbers(profile, dateStr) {
   return nums.sort((a,b) => a-b);
 }
 
-// =====================================================
-// FREQUENCY
-// =====================================================
 function computeFrequency() {
   const freq = {};
   for (let i = 1; i <= 49; i++) freq[i] = 0;
@@ -702,9 +537,6 @@ function getHotCold(n = 6) {
   };
 }
 
-// =====================================================
-// STRATEGIES
-// =====================================================
 function pickRandom(pool, n) {
   pool = [...pool];
   const out = [];
@@ -715,11 +547,11 @@ function pickRandom(pool, n) {
 }
 const STRATEGIES = {
   quick: {
-    desc: 'Pure random — every number has equal chance',
+    desc: '🎲 Quick Pick · Pure random, every number has equal chance',
     run: () => pickRandom(Array.from({length:49}, (_,i)=>i+1), 6),
   },
   lucky: {
-    desc: 'Weighted toward your daily lucky numbers',
+    desc: '✨ Lucky Pick · Mixed with your daily lucky numbers',
     run: () => {
       const p = currentProfile();
       const today = new Date().toISOString().slice(0,10);
@@ -731,7 +563,7 @@ const STRATEGIES = {
     },
   },
   hot: {
-    desc: 'From the 15 most frequently drawn numbers',
+    desc: '🔥 Hot Numbers · From the 15 most frequently drawn',
     run: () => {
       const freq = computeFrequency();
       const top = Object.entries(freq).map(([k,v]) => [Number(k), v])
@@ -740,7 +572,7 @@ const STRATEGIES = {
     },
   },
   cold: {
-    desc: 'From the 15 least frequently drawn (could be "due"!)',
+    desc: '❄️ Cold Numbers · From the 15 least drawn (might be "due"!)',
     run: () => {
       const freq = computeFrequency();
       const bottom = Object.entries(freq).map(([k,v]) => [Number(k), v])
@@ -749,7 +581,7 @@ const STRATEGIES = {
     },
   },
   balanced: {
-    desc: '2 hot + 2 cold + 2 random — diversified pick',
+    desc: '⚖️ Balanced · 2 hot + 2 cold + 2 mid for diversity',
     run: () => {
       const freq = computeFrequency();
       const all = Object.entries(freq).map(([k,v]) => [Number(k), v]);
@@ -766,12 +598,7 @@ const STRATEGIES = {
   },
 };
 
-// =====================================================
-// HELPERS
-// =====================================================
-function currentProfile() {
-  return state.profiles.find(p => p.id === state.currentProfileId);
-}
+function currentProfile() { return state.profiles.find(p => p.id === state.currentProfileId); }
 function colorForNum(n) {
   const palettes = [
     ['#e74c3c', '#c0392b'], ['#e67e22', '#d35400'],
@@ -789,9 +616,6 @@ function formatDate(iso) {
   return d.toLocaleDateString('en-SG', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
 }
 
-// =====================================================
-// RENDER
-// =====================================================
 function renderAll() {
   const p = currentProfile();
   if (!p) return;
@@ -810,8 +634,10 @@ function renderToday() {
   const todayStr = today.toISOString().slice(0,10);
   document.getElementById('greetName').textContent = p.name;
   document.getElementById('todayDate').textContent = today.toLocaleDateString('en-SG', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-  const { score, msg } = getDailyLuck(p, todayStr);
+  const { score, msg, tier } = getDailyLuck(p, todayStr);
   document.getElementById('luckScore').textContent = score;
+  document.getElementById('luckTier').textContent = tier;
+  document.getElementById('luckBar').style.width = score + '%';
   document.getElementById('luckMsg').innerHTML = `"${msg}"`;
   const w = getWesternZodiac(p.bdMonth, p.bdDay);
   document.getElementById('westZodEmoji').textContent = w.emoji;
@@ -951,9 +777,6 @@ function renderProfile() {
   });
 }
 
-// =====================================================
-// GENERATE
-// =====================================================
 let isAnimating = false;
 function generate() {
   if (isAnimating) return;
@@ -1002,9 +825,6 @@ function saveCurrent() {
   setTimeout(() => btn.innerHTML = orig, 800);
 }
 
-// =====================================================
-// CHECK
-// =====================================================
 function checkNumbers() {
   const inputs = [];
   for (let i = 0; i < 6; i++) {
@@ -1042,9 +862,6 @@ function checkNumbers() {
   `;
 }
 
-// =====================================================
-// MODALS
-// =====================================================
 function openAddDraw() {
   const html = `
     <h3>Add Latest Draw</h3>
@@ -1098,8 +915,7 @@ function submitAddDraw() {
 
 function openAddProfile() {
   const days = Array.from({length:31}, (_,i) => `<option value="${i+1}">${i+1}</option>`).join('');
-  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
-    .map((m,i) => `<option value="${i+1}">${m}</option>`).join('');
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'].map((m,i) => `<option value="${i+1}">${m}</option>`).join('');
   const currentYear = new Date().getFullYear();
   const years = Array.from({length: 100}, (_,i) => `<option value="${currentYear - i - 18}">${currentYear - i - 18}</option>`).join('');
   const html = `
@@ -1122,8 +938,7 @@ function submitAddProfile() {
   const name = document.getElementById('newName').value.trim();
   if (!name) { alert('Please enter a name'); return; }
   const profile = {
-    id: 'profile_' + Date.now(),
-    name,
+    id: 'profile_' + Date.now(), name,
     bdDay: parseInt(document.getElementById('newDay').value),
     bdMonth: parseInt(document.getElementById('newMonth').value),
     bdYear: parseInt(document.getElementById('newYear').value),
@@ -1143,9 +958,6 @@ function closeModal() {
   document.getElementById('modalBg').classList.remove('open');
 }
 
-// =====================================================
-// TABS
-// =====================================================
 function showTab(name) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.getElementById('view-' + name).classList.add('active');
@@ -1156,9 +968,6 @@ function showTab(name) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// =====================================================
-// SETUP
-// =====================================================
 function initSetupForm() {
   const ds = document.getElementById('setupDay');
   const ms = document.getElementById('setupMonth');
@@ -1176,8 +985,7 @@ function finishSetup() {
   const name = document.getElementById('setupName').value.trim();
   if (!name) { alert('Please enter your name'); return; }
   const profile = {
-    id: 'profile_' + Date.now(),
-    name,
+    id: 'profile_' + Date.now(), name,
     bdDay: parseInt(document.getElementById('setupDay').value),
     bdMonth: parseInt(document.getElementById('setupMonth').value),
     bdYear: parseInt(document.getElementById('setupYear').value),
@@ -1192,20 +1000,11 @@ function finishSetup() {
   maybeShowInstallBanner();
 }
 
-// =====================================================
-// INSTALL BANNER (iOS Safari)
-// =====================================================
-function isIOS() {
-  return /iPad|iPhone|iPod/.test(navigator.userAgent);
-}
-function isStandalone() {
-  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-}
+function isIOS() { return /iPad|iPhone|iPod/.test(navigator.userAgent); }
+function isStandalone() { return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true; }
 function maybeShowInstallBanner() {
   if (state.bannerDismissed || isStandalone()) return;
-  if (isIOS()) {
-    setTimeout(() => document.getElementById('installBanner').classList.add('show'), 3000);
-  }
+  if (isIOS()) setTimeout(() => document.getElementById('installBanner').classList.add('show'), 3000);
 }
 function dismissBanner() {
   document.getElementById('installBanner').classList.remove('show');
@@ -1213,15 +1012,14 @@ function dismissBanner() {
   saveState();
 }
 
-// =====================================================
-// EVENTS
-// =====================================================
+// ============ STRATEGY PILLS — AUTO-GENERATE ON TAP (the fix!) ============
 document.querySelectorAll('.pill[data-strat]').forEach(btn => {
   btn.onclick = () => {
     document.querySelectorAll('.pill[data-strat]').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     state.currentStrategy = btn.dataset.strat;
     document.getElementById('strategyDesc').textContent = STRATEGIES[state.currentStrategy].desc;
+    generate(); // ⬅️ AUTO-generate immediately when strategy is tapped
   };
 });
 
@@ -1229,7 +1027,6 @@ document.getElementById('modalBg').onclick = e => {
   if (e.target.id === 'modalBg') closeModal();
 };
 
-// Auto-tab
 ['chk0','chk1','chk2','chk3','chk4','chk5','chk6','addN0','addN1','addN2','addN3','addN4','addN5','addN6']
   .forEach((id, idx, arr) => {
     document.addEventListener('input', e => {
@@ -1240,9 +1037,6 @@ document.getElementById('modalBg').onclick = e => {
     });
   });
 
-// =====================================================
-// BOOT
-// =====================================================
 loadState();
 initSetupForm();
 if (state.profiles.length > 0 && state.currentProfileId) {
